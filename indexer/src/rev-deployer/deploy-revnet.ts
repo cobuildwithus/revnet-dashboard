@@ -9,7 +9,7 @@ async function deployRevnet(params: {
 }) {
   const { context, event } = params;
 
-  const { args } = event;
+  const { args, block } = event;
 
   const { revnetId } = args;
 
@@ -17,5 +17,6 @@ async function deployRevnet(params: {
     chainId: context.chain.id,
     projectId: revnetId.toString(),
     isRevnet: true,
+    createdAt: Number(block.timestamp),
   });
 }

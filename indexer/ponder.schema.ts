@@ -8,12 +8,18 @@ import {
 export const chainId = (t: PgColumnsBuilders) => ({
   chainId: t.integer().notNull(),
 });
+export const createdAt = (t: PgColumnsBuilders) => ({
+  createdAt: t.integer().notNull(),
+});
+
+export const projectId = (t: PgColumnsBuilders) => ({ projectId: t.numeric() });
 
 export const project = onchainTable(
   "project",
   (t) => ({
     ...chainId(t),
-    projectId: t.numeric(),
+    ...createdAt(t),
+    ...projectId(t),
     isRevnet: t.boolean().notNull(),
   }),
   (t) => ({

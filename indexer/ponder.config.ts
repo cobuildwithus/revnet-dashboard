@@ -1,6 +1,6 @@
 import { createConfig } from "ponder";
 import { contracts } from "../contracts/addresses";
-import { jbTokensAbi, revDeployerAbi } from "./abis";
+import { jbProjectsAbi, jbTokensAbi, revDeployerAbi } from "./abis";
 import { config, getChainsAndRpcUrls } from "./lib/config";
 
 export default createConfig({
@@ -16,6 +16,11 @@ export default createConfig({
       chain: config.JBTokens,
       abi: jbTokensAbi,
       address: contracts.JBTokens,
+    },
+    JBProjects: {
+      chain: config.JBProjects,
+      abi: jbProjectsAbi,
+      address: contracts.JBProjects,
     },
   },
 });

@@ -5,6 +5,7 @@ import { contracts } from "./addresses"
 const contractsToGenerate = [
   { name: "REVDeployer", address: contracts.REVDeployer },
   { name: "JBTokens", address: contracts.JBTokens },
+  { name: "JBProjects", address: contracts.JBProjects },
 ]
 
 export default defineConfig(() => {
