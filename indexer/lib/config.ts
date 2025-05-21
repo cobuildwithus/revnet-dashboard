@@ -1,4 +1,9 @@
-export const indexerConfig = {
+import { base } from "viem/chains";
+import { mainnet } from "viem/chains";
+import { arbitrum, optimism } from "viem/chains";
+import { rpcUrl } from "./rpc-url";
+
+export const config = {
   RevDeployer: {
     ethereum: {
       startBlock: 21869094,
@@ -13,4 +18,39 @@ export const indexerConfig = {
       startBlock: 132116325,
     },
   },
+  JBTokens: {
+    ethereum: {
+      startBlock: 21863179,
+    },
+    arbitrum: {
+      startBlock: 306857750,
+    },
+    base: {
+      startBlock: 26485001,
+    },
+    optimism: {
+      startBlock: 132080297,
+    },
+  },
+};
+
+export const getChainsAndRpcUrls = () => {
+  return {
+    base: {
+      id: base.id,
+      rpc: rpcUrl("base"),
+    },
+    ethereum: {
+      id: mainnet.id,
+      rpc: rpcUrl("eth"),
+    },
+    arbitrum: {
+      id: arbitrum.id,
+      rpc: rpcUrl("arbitrum"),
+    },
+    optimism: {
+      id: optimism.id,
+      rpc: rpcUrl("optimism"),
+    },
+  };
 };
