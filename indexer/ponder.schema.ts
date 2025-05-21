@@ -5,7 +5,8 @@ export const chainId = (t: PgColumnsBuilders) => ({
 });
 
 export const project = onchainTable("project", (t) => ({
+  id: t.text().primaryKey(),
   ...chainId(t),
-  projectId: t.numeric().primaryKey(),
+  projectId: t.numeric(),
   isRevnet: t.boolean().notNull(),
 }));
