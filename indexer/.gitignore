@@ -12,7 +12,9 @@ yarn-error.log*
 
 # Env files
 .env*.local
+.env
 
 # Ponder
 /generated/
 /.ponder/
+

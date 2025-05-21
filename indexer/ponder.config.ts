@@ -1,20 +1,26 @@
 import { createConfig } from "ponder";
 
-import { ExampleContractAbi } from "./abis/ExampleContractAbi";
+import { base } from "viem/chains";
+import { baseContracts } from "../contracts/addresses";
+import { revDeployerAbi } from "./abis";
+
+const StartBlocks = {
+  Base: 26521040,
+};
 
 export default createConfig({
   chains: {
-    mainnet: {
-      id: 1,
-      rpc: process.env.PONDER_RPC_URL_1!,
+    base: {
+      id: base.id,
+      rpc: process.env.PONDER_RPC_URL_BASE,
     },
   },
   contracts: {
-    ExampleContract: {
-      chain: "mainnet",
-      abi: ExampleContractAbi,
-      address: "0x0000000000000000000000000000000000000000",
-      startBlock: 1234567,
+    REVDeployer: {
+      chain: "base",
+      abi: revDeployerAbi,
+      address: baseContracts.REVDeployer,
+      startBlock: StartBlocks.Base,
     },
   },
 });
