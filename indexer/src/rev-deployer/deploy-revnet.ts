@@ -8,15 +8,15 @@ async function deployRevnet(params: {
   context: Context<"REVDeployer:DeployRevnet">;
 }) {
   const { context, event } = params;
-
-  const { args, block } = event;
-
+  const { args } = event;
   const { revnetId } = args;
 
-  await context.db.insert(project).values({
-    chainId: context.chain.id,
-    projectId: revnetId.toString(),
-    isRevnet: true,
-    createdAt: Number(block.timestamp),
-  });
+  await context.db
+    .update(project, {
+      chainId: context.chain.id,
+      projectId: Number(revnetId),
+    })
+    .set({
+      isRevnet: true,
+    });
 }

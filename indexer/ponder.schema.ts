@@ -12,7 +12,9 @@ export const createdAt = (t: PgColumnsBuilders) => ({
   createdAt: t.integer().notNull(),
 });
 
-export const projectId = (t: PgColumnsBuilders) => ({ projectId: t.numeric() });
+export const projectId = (t: PgColumnsBuilders) => ({
+  projectId: t.integer().notNull(),
+});
 
 export const project = onchainTable(
   "project",
@@ -21,6 +23,11 @@ export const project = onchainTable(
     ...createdAt(t),
     ...projectId(t),
     isRevnet: t.boolean().notNull(),
+    deployer: t.hex().notNull(),
+    owner: t.hex().notNull(),
+    erc20: t.hex(),
+    erc20Name: t.text(),
+    erc20Symbol: t.text(),
   }),
   (t) => ({
     projectIdx: index().on(t.projectId),
