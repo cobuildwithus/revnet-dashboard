@@ -1,4 +1,468 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// JBTokens
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * [__View Contract on Base Basescan__](https://basescan.org/address/0xa59e9f424901fb9dbd8913a9a32a081f9425bf36)
+ */
+export const jbTokensAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      {
+        name: 'directory',
+        internalType: 'contract IJBDirectory',
+        type: 'address',
+      },
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  { type: 'error', inputs: [], name: 'FailedDeployment' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'balance', internalType: 'uint256', type: 'uint256' },
+      { name: 'needed', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'InsufficientBalance',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'controller', internalType: 'address', type: 'address' }],
+    name: 'JBControlled_ControllerUnauthorized',
+  },
+  { type: 'error', inputs: [], name: 'JBTokens_EmptyName' },
+  { type: 'error', inputs: [], name: 'JBTokens_EmptySymbol' },
+  { type: 'error', inputs: [], name: 'JBTokens_EmptyToken' },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+      { name: 'creditBalance', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'JBTokens_InsufficientCredits',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+      { name: 'tokenBalance', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'JBTokens_InsufficientTokensToBurn',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+      { name: 'limit', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'JBTokens_OverflowAlert',
+  },
+  {
+    type: 'error',
+    inputs: [
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    name: 'JBTokens_ProjectAlreadyHasToken',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'projectId', internalType: 'uint256', type: 'uint256' }],
+    name: 'JBTokens_TokenAlreadyBeingUsed',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'projectId', internalType: 'uint256', type: 'uint256' }],
+    name: 'JBTokens_TokenCantBeAdded',
+  },
+  { type: 'error', inputs: [], name: 'JBTokens_TokenNotFound' },
+  {
+    type: 'error',
+    inputs: [{ name: 'decimals', internalType: 'uint256', type: 'uint256' }],
+    name: 'JBTokens_TokensMustHave18Decimals',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'holder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'count',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'creditBalance',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'tokenBalance',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'Burn',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'holder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'creditBalance',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'count',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'beneficiary',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'ClaimTokens',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'token',
+        internalType: 'contract IJBToken',
+        type: 'address',
+        indexed: true,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'symbol',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'salt',
+        internalType: 'bytes32',
+        type: 'bytes32',
+        indexed: false,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'DeployERC20',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'holder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'count',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'tokensWereClaimed',
+        internalType: 'bool',
+        type: 'bool',
+        indexed: false,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'Mint',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'token',
+        internalType: 'contract IJBToken',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'SetToken',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'holder',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'projectId',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: true,
+      },
+      {
+        name: 'recipient',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'count',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'caller',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'TransferCredits',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'DIRECTORY',
+    outputs: [
+      { name: '', internalType: 'contract IJBDirectory', type: 'address' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'TOKEN',
+    outputs: [{ name: '', internalType: 'contract IJBToken', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'burnFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+      { name: 'beneficiary', internalType: 'address', type: 'address' },
+    ],
+    name: 'claimTokensFor',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'creditBalanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'symbol', internalType: 'string', type: 'string' },
+      { name: 'salt', internalType: 'bytes32', type: 'bytes32' },
+    ],
+    name: 'deployERC20For',
+    outputs: [
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'mintFor',
+    outputs: [
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    name: 'projectIdOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'token', internalType: 'contract IJBToken', type: 'address' },
+    ],
+    name: 'setTokenFor',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'projectId', internalType: 'uint256', type: 'uint256' }],
+    name: 'tokenOf',
+    outputs: [{ name: '', internalType: 'contract IJBToken', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'totalBalanceOf',
+    outputs: [{ name: 'balance', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'projectId', internalType: 'uint256', type: 'uint256' }],
+    name: 'totalCreditSupplyOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'projectId', internalType: 'uint256', type: 'uint256' }],
+    name: 'totalSupplyOf',
+    outputs: [
+      { name: 'totalSupply', internalType: 'uint256', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'holder', internalType: 'address', type: 'address' },
+      { name: 'projectId', internalType: 'uint256', type: 'uint256' },
+      { name: 'recipient', internalType: 'address', type: 'address' },
+      { name: 'count', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferCreditsFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+/**
+ * [__View Contract on Base Basescan__](https://basescan.org/address/0xa59e9f424901fb9dbd8913a9a32a081f9425bf36)
+ */
+export const jbTokensAddress = {
+  8453: '0xA59e9F424901fB9DBD8913a9A32A081F9425bf36',
+} as const
+
+/**
+ * [__View Contract on Base Basescan__](https://basescan.org/address/0xa59e9f424901fb9dbd8913a9a32a081f9425bf36)
+ */
+export const jbTokensConfig = {
+  address: jbTokensAddress,
+  abi: jbTokensAbi,
+} as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // REVDeployer
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

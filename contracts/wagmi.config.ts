@@ -1,8 +1,11 @@
 import { defineConfig, loadEnv } from "@wagmi/cli"
 import { etherscan } from "@wagmi/cli/plugins"
-import { baseContracts } from "./addresses"
+import { contracts } from "./addresses"
 
-const contracts = [{ name: "REVDeployer", address: baseContracts.REVDeployer }]
+const contractsToGenerate = [
+  { name: "REVDeployer", address: contracts.REVDeployer },
+  { name: "JBTokens", address: contracts.JBTokens },
+]
 
 export default defineConfig(() => {
   const env = loadEnv({ mode: process.env.NODE_ENV, envDir: process.cwd() })
@@ -12,7 +15,7 @@ export default defineConfig(() => {
     contracts: [],
     plugins: [
       // etherscan({ apiKey: env.ETHERSCAN_API_KEY, chainId: 1, contracts: mainnetContracts }),
-      etherscan({ apiKey: env.BASESCAN_API_KEY, chainId: 8453, contracts: contracts }),
+      etherscan({ apiKey: env.BASESCAN_API_KEY, chainId: 8453, contracts: contractsToGenerate }),
     ],
   }
 })
