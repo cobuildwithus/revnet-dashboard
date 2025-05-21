@@ -1,5 +1,5 @@
 import { type Context, type Event, ponder } from "ponder:registry";
-import { Revnet } from "ponder:schema";
+import { project } from "ponder:schema";
 
 ponder.on("REVDeployer:DeployRevnet", deployRevnet);
 
@@ -13,7 +13,9 @@ async function deployRevnet(params: {
 
   const { revnetId } = args;
 
-  await context.db.insert(Revnet).values({
-    revnetId: revnetId.toString(),
+  await context.db.insert(project).values({
+    chainId: context.chain.id,
+    projectId: revnetId.toString(),
+    isRevnet: true,
   });
 }

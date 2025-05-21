@@ -1,26 +1,36 @@
 import { createConfig } from "ponder";
+import { arbitrum, base, mainnet, optimism } from "viem/chains";
 
-import { base } from "viem/chains";
 import { baseContracts } from "../contracts/addresses";
 import { revDeployerAbi } from "./abis";
-
-const StartBlocks = {
-  Base: 26521040,
-};
+import { rpcUrl } from "./lib/rpc-url";
+import { indexerConfig } from "./lib/config";
 
 export default createConfig({
+  ordering: "omnichain",
   chains: {
     base: {
       id: base.id,
-      rpc: process.env.PONDER_RPC_URL_BASE,
+      rpc: rpcUrl("base"),
+    },
+    ethereum: {
+      id: mainnet.id,
+      rpc: rpcUrl("eth"),
+    },
+    arbitrum: {
+      id: arbitrum.id,
+      rpc: rpcUrl("arbitrum"),
+    },
+    optimism: {
+      id: optimism.id,
+      rpc: rpcUrl("optimism"),
     },
   },
   contracts: {
     REVDeployer: {
-      chain: "base",
+      chain: indexerConfig.RevDeployer,
       abi: revDeployerAbi,
       address: baseContracts.REVDeployer,
-      startBlock: StartBlocks.Base,
     },
   },
 });
