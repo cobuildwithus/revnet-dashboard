@@ -15,13 +15,7 @@ async function burn({
   const projectId = Number(_projectId);
   const { id: chainId } = context.chain;
 
-  const _project = await context.db.find(project, { projectId, chainId });
-
-  if (!_project) {
-    throw new Error("Missing project");
-  }
-
-  const updatedProject = await context.db
+  await context.db
     .update(project, {
       chainId,
       projectId,
@@ -34,8 +28,5 @@ async function burn({
     db: context.db,
     chainId,
     projectId,
-    overflow: updatedProject.balance,
-    tax: 1000n,
-    totalSupply: updatedProject.erc20Supply,
   });
 }

@@ -16,7 +16,7 @@ async function mint({
   const projectId = Number(_projectId);
 
   // Update project: increment erc20Supply
-  const updatedProject = await context.db
+  await context.db
     .update(project, {
       chainId,
       projectId,
@@ -29,8 +29,5 @@ async function mint({
     db: context.db,
     chainId,
     projectId,
-    overflow: updatedProject.balance,
-    tax: 1000n,
-    totalSupply: updatedProject.erc20Supply,
   });
 }

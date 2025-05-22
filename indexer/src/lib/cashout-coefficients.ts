@@ -1,5 +1,5 @@
 import type { Context } from "ponder:registry";
-import { project } from "ponder:schema";
+import { project, ruleset } from "ponder:schema";
 
 const MAX = 10_000n;
 
@@ -59,19 +59,42 @@ export async function refreshProjectCashoutCoefficients({
   db,
   chainId,
   projectId,
-  overflow,
-  tax,
-  totalSupply,
 }: {
   db: Context["db"];
   chainId: number;
   projectId: number;
-  overflow: bigint;
-  tax: bigint;
-  totalSupply: bigint;
 }) {
-  const A = calculateCashoutA(overflow, tax, totalSupply);
-  const B = calculateCashoutB(overflow, tax, totalSupply);
+  const currentProject = await db.find(project, {
+    chainId,
+    projectId,
+  });
+
+  if (!currentProject) {
+    throw new Error(`Project ${projectId} not found on chain ${chainId}`);
+  }
+
+  const currentRuleset = await db.find(ruleset, {
+    chainId,
+    rulesetId: currentProject.currentRulesetId,
+    projectId,
+  });
+
+  if (!currentRuleset) {
+    throw new Error(
+      `Ruleset ${currentProject.currentRulesetId} not found for project ${projectId} on chain ${chainId}`
+    );
+  }
+
+  const A = calculateCashoutA(
+    currentProject.balance,
+    BigInt(currentRuleset.cashOutTaxRate),
+    currentProject.erc20Supply
+  );
+  const B = calculateCashoutB(
+    currentProject.balance,
+    BigInt(currentRuleset.cashOutTaxRate),
+    currentProject.erc20Supply
+  );
 
   // Update the project's cashout coefficients in the database
   await db
