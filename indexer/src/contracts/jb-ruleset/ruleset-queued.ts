@@ -70,6 +70,7 @@ async function handleRulesetQueued({
     start: bigint;
     rulesetId: bigint;
   } | null = null;
+
   if (previousRuleset && previousRuleset.basedOnId > 0n) {
     // Get the base ruleset to determine cycle number and, if needed, derive weight
     baseRuleset = await context.db.find(ruleset, {
@@ -77,35 +78,53 @@ async function handleRulesetQueued({
       projectId,
       rulesetId: previousRuleset.basedOnId,
     });
-    if (baseRuleset) {
-      // Derive the number of cycles that have elapsed between the base ruleset
-      // and the intended start of the newly-queued ruleset.
-      if (baseRuleset.duration !== 0n) {
-        const gap =
-          BigInt(mustStartAtOrAfter) > baseRuleset.start
-            ? BigInt(mustStartAtOrAfter) - baseRuleset.start
-            : 0n;
-        cyclesElapsed = Number(gap / baseRuleset.duration);
-      }
 
-      cycleNumber = baseRuleset.cycleNumber + cyclesElapsed + 1;
+    // If the base ruleset is unexpectedly missing, fail loud to avoid corrupt data
+    if (!baseRuleset) {
+      throw new Error(
+        `Missing base ruleset ${previousRuleset.basedOnId.toString()} for project ${projectId} on chain ${chainId}`
+      );
+    }
 
-      // -------------------------------------------------------------------
-      //              Derive weight when the flag (weight == 1) is used
-      // -------------------------------------------------------------------
-      if (weight === 1n) {
-        const MAX_WEIGHT_CUT_PERCENT = 1_000_000_000n; // JBConstants.MAX_WEIGHT_CUT_PERCENT
-        const baseWeight = baseRuleset.weight;
-        const cutPercent = BigInt(baseRuleset.weightCutPercent);
-        const cutFactor = MAX_WEIGHT_CUT_PERCENT - cutPercent;
-        // Apply the cut once per cycle between base and new (cyclesElapsed+1)
-        let derivedWeight = baseWeight;
-        const cyclesToApply = cyclesElapsed + 1; // always at least 1
-        for (let i = 0; i < cyclesToApply; i++) {
-          derivedWeight = (derivedWeight * cutFactor) / MAX_WEIGHT_CUT_PERCENT;
-        }
-        weight = derivedWeight;
+    // ---------------------------------------------------------------------
+    //        Derive cycle number & cycles elapsed (handles skipped cycles)
+    // ---------------------------------------------------------------------
+    if (baseRuleset.duration !== 0n) {
+      const gap =
+        BigInt(mustStartAtOrAfter) > baseRuleset.start
+          ? BigInt(mustStartAtOrAfter) - baseRuleset.start
+          : 0n;
+      // floor division gives the number of *full* cycles completed since base
+      cyclesElapsed = Number(gap / baseRuleset.duration);
+    }
+
+    // For zero-duration bases, a new cycle starts immediately after the base
+    // "instant cycle" completes, so we always increment by exactly one.
+    if (baseRuleset.duration === 0n) {
+      cycleNumber = baseRuleset.cycleNumber + 1;
+    } else {
+      // Otherwise, the new cycle is the base plus the number of full cycles that have elapsed
+      cycleNumber = baseRuleset.cycleNumber + cyclesElapsed;
+    }
+
+    // -------------------------------------------------------------------
+    //              Derive weight when the flag (weight == 1) is used
+    // -------------------------------------------------------------------
+    if (weight === 1n) {
+      const MAX_WEIGHT_CUT_PERCENT = 1_000_000_000n; // JBConstants.MAX_WEIGHT_CUT_PERCENT
+      const baseWeight = baseRuleset.weight;
+      const cutPercent = BigInt(baseRuleset.weightCutPercent);
+      const cutFactor = MAX_WEIGHT_CUT_PERCENT - cutPercent;
+
+      // Number of cuts to apply equals cyclesElapsed, except we always apply
+      // at least one cut when the base ruleset duration is 0 (instant cycle)
+      const cyclesToApply = baseRuleset.duration === 0n ? 1 : cyclesElapsed;
+
+      let derivedWeight = baseWeight;
+      for (let i = 0; i < cyclesToApply; i++) {
+        derivedWeight = (derivedWeight * cutFactor) / MAX_WEIGHT_CUT_PERCENT;
       }
+      weight = derivedWeight;
     }
   }
 
@@ -123,13 +142,16 @@ async function handleRulesetQueued({
   // ---------------------------------------------------------------------
   //   Determine active status, accounting for zero-duration base rulesets
   // ---------------------------------------------------------------------
-  const now = BigInt(Math.floor(Date.now() / 1000));
+  // Use the block timestamp of the event as the reference clock to avoid any
+  // local-machine time drift.
+  const now = BigInt(event.block.timestamp);
   const isActive =
     (baseRuleset && baseRuleset.duration === 0n) || derivedStart <= now;
 
-  // If the base ruleset had duration = 0, it ends immediately once this new
-  // ruleset is queued, so mark the base as inactive.
-  if (baseRuleset && baseRuleset.duration === 0n) {
+  // Ensure only one ruleset is marked active at a time. If this new ruleset is
+  // already active (either because the base had duration 0 *or* its start time
+  // is now in the past), mark the base as inactive.
+  if (baseRuleset && (baseRuleset.duration === 0n || isActive)) {
     await context.db
       .update(ruleset, {
         chainId,

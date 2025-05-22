@@ -28,12 +28,16 @@ async function handleRulesetInitialized({
       projectId,
       rulesetId: basedOnId,
     });
-    if (baseRuleset) {
-      // We cannot know yet if any cycles were skipped (that requires duration &
-      // start from the queued event), so we assume the typical sequential case
-      // of exactly one cycle ahead of the base.
-      cycleNumber = baseRuleset.cycleNumber + 1;
+    if (!baseRuleset) {
+      throw new Error(
+        `Missing base ruleset ${basedOnId.toString()} for project ${projectId} on chain ${chainId}`
+      );
     }
+
+    // We cannot know yet if any cycles were skipped (that requires duration &
+    // start from the queued event), so we assume the typical sequential case
+    // of exactly one cycle ahead of the base.
+    cycleNumber = baseRuleset.cycleNumber + 1;
   }
 
   // Verify project exists
@@ -84,9 +88,10 @@ async function handleRulesetInitialized({
       useDataHookForCashOut: false,
     })
     .onConflictDoUpdate({
+      // Only update immutable or authoritative fields. We intentionally do NOT
+      // update cycleNumber or isActive here to avoid overwriting the finalized
+      // values that the later RulesetQueued handler will compute.
       basedOnId,
       createdAt: Number(event.block.timestamp),
-      cycleNumber,
-      isActive: isActiveInitial,
     });
 }
