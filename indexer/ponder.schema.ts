@@ -82,6 +82,74 @@ export const participant = onchainTable(
   })
 );
 
+export const ruleset = onchainTable(
+  "ruleset",
+  (t) => ({
+    // Primary identifiers
+    ...chainId(t),
+    ...projectId(t),
+    rulesetId: t.bigint().notNull(), // uint256 from events
+
+    // Timestamps
+    ...createdAt(t), // when queued/initialized
+    queuedAt: t.integer().notNull(),
+
+    // Core ruleset properties from JBRuleset struct
+    cycleNumber: t.integer().notNull(),
+    basedOnId: t.bigint().notNull(),
+    start: t.bigint().notNull(),
+    duration: t.bigint().notNull(),
+    weight: t.bigint().notNull(),
+    weightCutPercent: t.integer().notNull(),
+    approvalHook: t.hex(),
+
+    // Metadata fields (unpacked from uint256)
+    reservedPercent: t.integer().notNull(),
+    cashOutTaxRate: t.integer().notNull(),
+    baseCurrency: t.integer().notNull(),
+
+    // Boolean flags from metadata
+    pausePay: t.boolean().notNull(),
+    pauseCreditTransfers: t.boolean().notNull(),
+    allowOwnerMinting: t.boolean().notNull(),
+    allowSetCustomToken: t.boolean().notNull(),
+    allowTerminalMigration: t.boolean().notNull(),
+    allowSetTerminals: t.boolean().notNull(),
+    allowSetController: t.boolean().notNull(),
+    allowAddAccountingContext: t.boolean().notNull(),
+    allowAddPriceFeed: t.boolean().notNull(),
+    ownerMustSendPayouts: t.boolean().notNull(),
+    holdFees: t.boolean().notNull(),
+    useTotalSurplusForCashOuts: t.boolean().notNull(),
+    useDataHookForPay: t.boolean().notNull(),
+    useDataHookForCashOut: t.boolean().notNull(),
+
+    // Data hook address from metadata
+    dataHook: t.hex(),
+
+    // Raw metadata values
+    metadata: t.bigint().notNull(), // Full uint256 metadata
+    metadataExtra: t.integer(), // The uint16 metadata field from expandMetadata
+
+    // Event specific fields
+    mustStartAtOrAfter: t.bigint(),
+    caller: t.hex().notNull(),
+
+    // Status fields
+    isActive: t.boolean().notNull().default(false),
+    approvalStatus: t.text(), // Could be enum: 'Empty', 'Approved', 'Failed', 'ApprovalExpected'
+  }),
+  (table) => ({
+    projectIdx: index().on(table.projectId),
+    rulesetIdx: index().on(table.rulesetId),
+    activeIdx: index().on(table.projectId, table.isActive),
+    startIdx: index().on(table.start),
+    pk: primaryKey({
+      columns: [table.chainId, table.projectId, table.rulesetId],
+    }),
+  })
+);
+
 export const ERC20ToProjectId = onchainTable(
   "_kv_ERC20ToProjectId",
   (t) => ({

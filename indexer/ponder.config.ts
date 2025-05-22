@@ -4,6 +4,7 @@ import {
   jbControllerAbi,
   jbMultiTerminalAbi,
   jbProjectsAbi,
+  jbRulesetsAbi,
   jbTokensAbi,
   revDeployerAbi,
 } from "./abis";
@@ -47,6 +48,11 @@ export default createConfig({
       chain: config.JBMultiTerminal,
       abi: jbMultiTerminalAbi,
       address: contracts.JBMultiTerminal,
+    },
+    JBRulesets: {
+      chain: config.JBRulesets,
+      abi: jbRulesetsAbi,
+      address: contracts.JBRulesets,
     },
   },
 });
