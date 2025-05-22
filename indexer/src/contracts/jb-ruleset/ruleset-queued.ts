@@ -44,7 +44,7 @@ async function handleRulesetQueued({
   // Unpack metadata
   const unpackedMetadata = unpackMetadata(_metadata);
 
-  // Calculate cycle number (this is simplified - in production you'd need to query previous rulesets)
+  // Calculate cycle number (accurately handles skipped cycles between the base ruleset and the newly queued one)
   const previousRuleset = await context.db.find(ruleset, {
     chainId,
     projectId,
@@ -60,7 +60,23 @@ async function handleRulesetQueued({
       rulesetId: previousRuleset.basedOnId,
     });
     if (baseRuleset) {
-      cycleNumber = baseRuleset.cycleNumber + 1;
+      // Derive the number of cycles that have elapsed between the base ruleset
+      // and the intended start of the newly-queued ruleset. This follows the
+      // `deriveCycleNumberFrom` logic found in the Solidity contract:
+      //   cyclesElapsed = (mustStartAtOrAfter - base.start) / base.duration
+      // If the base has duration == 0, it lasts indefinitely until replaced so
+      // the next ruleset is simply the following cycle ( +1 ).
+      // Guard against negative gaps or division by zero.
+      let cyclesElapsed = 0;
+      if (baseRuleset.duration !== 0n) {
+        const gap =
+          BigInt(mustStartAtOrAfter) > baseRuleset.start
+            ? BigInt(mustStartAtOrAfter) - baseRuleset.start
+            : 0n;
+        cyclesElapsed = Number(gap / baseRuleset.duration);
+      }
+
+      cycleNumber = baseRuleset.cycleNumber + cyclesElapsed + 1;
     }
   }
 

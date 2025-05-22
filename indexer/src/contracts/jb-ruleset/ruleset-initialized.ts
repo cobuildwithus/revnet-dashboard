@@ -16,6 +16,24 @@ async function handleRulesetInitialized({
   const projectId = Number(_projectId);
   const chainId = context.chain.id;
 
+  // Derive a provisional cycle number. This will be updated (with full accuracy)
+  // once the corresponding `RulesetQueued` event is processed, but setting it
+  // here avoids having a placeholder value of 0 in the interim.
+  let cycleNumber = 1;
+  if (basedOnId > 0n) {
+    const baseRuleset = await context.db.find(ruleset, {
+      chainId,
+      projectId,
+      rulesetId: basedOnId,
+    });
+    if (baseRuleset) {
+      // We cannot know yet if any cycles were skipped (that requires duration &
+      // start from the queued event), so we assume the typical sequential case
+      // of exactly one cycle ahead of the base.
+      cycleNumber = baseRuleset.cycleNumber + 1;
+    }
+  }
+
   // Verify project exists
   const _project = await context.db.find(project, {
     projectId,
@@ -35,7 +53,7 @@ async function handleRulesetInitialized({
       rulesetId,
       createdAt: Number(event.block.timestamp),
       queuedAt: Number(event.block.timestamp), // Set to same as createdAt for now
-      cycleNumber: 0, // Will be updated when queued
+      cycleNumber, // Provisional value; will be re-evaluated when queued
       basedOnId,
       start: 0n, // Will be updated when queued
       duration: 0n, // Will be updated when queued
@@ -65,5 +83,6 @@ async function handleRulesetInitialized({
     .onConflictDoUpdate({
       basedOnId,
       createdAt: Number(event.block.timestamp),
+      cycleNumber,
     });
 }
