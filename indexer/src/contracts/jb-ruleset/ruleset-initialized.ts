@@ -20,8 +20,6 @@ async function handleRulesetInitialized({
   // once the corresponding `RulesetQueued` event is processed, but setting it
   // here avoids having a placeholder value of 0 in the interim.
   let cycleNumber = 1;
-  // The first ruleset of a project (basedOnId == 0) is active immediately.
-  const isActiveInitial = basedOnId === 0n;
   if (basedOnId > 0n) {
     const baseRuleset = await context.db.find(ruleset, {
       chainId,
@@ -67,7 +65,6 @@ async function handleRulesetInitialized({
       weightCutPercent: 0, // Will be updated when queued
       metadata: 0n, // Will be updated when queued
       caller,
-      isActive: isActiveInitial,
       // Default metadata values
       reservedPercent: 0,
       cashOutTaxRate: 0,
@@ -89,7 +86,7 @@ async function handleRulesetInitialized({
     })
     .onConflictDoUpdate({
       // Only update immutable or authoritative fields. We intentionally do NOT
-      // update cycleNumber or isActive here to avoid overwriting the finalized
+      // update cycleNumber here to avoid overwriting the finalized
       // values that the later RulesetQueued handler will compute.
       basedOnId,
       createdAt: Number(event.block.timestamp),

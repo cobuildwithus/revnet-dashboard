@@ -55,4 +55,26 @@ export default createConfig({
       address: contracts.JBRulesets,
     },
   },
+  blocks: {
+    CheckRulesetBase: {
+      chain: "base",
+      startBlock: "latest",
+      interval: 60 / 2, // Every 1 minute (base block time is 2s)
+    },
+    CheckRulesetEthereum: {
+      chain: "ethereum",
+      startBlock: "latest",
+      interval: 60 / 12, // Every 1 minute (ethereum block time is ~12s)
+    },
+    CheckRulesetOptimism: {
+      chain: "optimism",
+      startBlock: "latest",
+      interval: 60 / 2, // Every 1 minute (optimism block time is 2s)
+    },
+    CheckRulesetArbitrum: {
+      chain: "arbitrum",
+      startBlock: "latest",
+      interval: 60 / 0.25, // Every 1 minute (arbitrum block time is ~0.25s)
+    },
+  },
 });

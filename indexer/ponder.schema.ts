@@ -44,6 +44,8 @@ export const project = onchainTable(
     cashout__A: t.bigint().notNull().default(BigInt(0)),
     cashout__B: t.bigint().notNull().default(BigInt(0)),
 
+    currentRulesetId: t.bigint().notNull().default(BigInt(0)),
+
     contributorsCount: t.integer().notNull().default(0),
     redeemCount: t.integer().notNull().default(0),
     redeemVolume: t.bigint().notNull().default(BigInt(0)),
@@ -141,13 +143,11 @@ export const ruleset = onchainTable(
     caller: t.hex().notNull(),
 
     // Status fields
-    isActive: t.boolean().notNull().default(false),
     approvalStatus: t.text(), // Could be enum: 'Empty', 'Approved', 'Failed', 'ApprovalExpected'
   }),
   (table) => ({
     projectIdx: index().on(table.projectId),
     rulesetIdx: index().on(table.rulesetId),
-    activeIdx: index().on(table.projectId, table.isActive),
     startIdx: index().on(table.start),
     pk: primaryKey({
       columns: [table.chainId, table.projectId, table.rulesetId],

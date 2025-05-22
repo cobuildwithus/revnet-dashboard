@@ -146,28 +146,6 @@ async function handleRulesetQueued({
       )
     : BigInt(mustStartAtOrAfter);
 
-  // ---------------------------------------------------------------------
-  //   Determine active status, accounting for zero-duration base rulesets
-  // ---------------------------------------------------------------------
-  // Use the block timestamp of the event as the reference clock to avoid any
-  // local-machine time drift.
-  const now = BigInt(event.block.timestamp);
-  const isActive =
-    (baseRuleset && baseRuleset.duration === 0n) || derivedStart <= now;
-
-  // Ensure only one ruleset is marked active at a time. If this new ruleset is
-  // already active (either because the base had duration 0 *or* its start time
-  // is now in the past), mark the base as inactive.
-  if (baseRuleset && (baseRuleset.duration === 0n || isActive)) {
-    await context.db
-      .update(ruleset, {
-        chainId,
-        projectId,
-        rulesetId: baseRuleset.rulesetId,
-      })
-      .set({ isActive: false });
-  }
-
   // Create or update the ruleset with all queue data
   await context.db
     .insert(ruleset)
@@ -187,7 +165,6 @@ async function handleRulesetQueued({
       metadata: _metadata,
       mustStartAtOrAfter: BigInt(mustStartAtOrAfter),
       caller,
-      isActive,
       // Unpacked metadata fields
       reservedPercent: unpackedMetadata.reservedPercent,
       cashOutTaxRate: unpackedMetadata.cashOutTaxRate,
@@ -223,7 +200,6 @@ async function handleRulesetQueued({
       metadata: _metadata,
       mustStartAtOrAfter: BigInt(mustStartAtOrAfter),
       caller,
-      isActive,
       // Update all unpacked metadata fields
       reservedPercent: unpackedMetadata.reservedPercent,
       cashOutTaxRate: unpackedMetadata.cashOutTaxRate,
