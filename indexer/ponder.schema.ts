@@ -41,6 +41,9 @@ export const project = onchainTable(
     erc20Name: t.text(),
     erc20Symbol: t.text(),
 
+    cashout__A: t.bigint().notNull().default(BigInt(0)),
+    cashout__B: t.bigint().notNull().default(BigInt(0)),
+
     contributorsCount: t.integer().notNull().default(0),
     redeemCount: t.integer().notNull().default(0),
     redeemVolume: t.bigint().notNull().default(BigInt(0)),
@@ -76,6 +79,7 @@ export const participant = onchainTable(
     isRevnet: t.boolean(),
     address: t.hex().notNull(),
     firstOwned: t.integer(),
+    cashOutValue: t.bigint().notNull().default(BigInt(0)),
   }),
   (t) => ({
     addressIdx: index().on(t.address),

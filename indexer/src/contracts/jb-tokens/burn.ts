@@ -1,5 +1,6 @@
 import { type Event, type Context, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on("JBTokens:Burn", burn);
 
@@ -20,7 +21,7 @@ async function burn({
     throw new Error("Missing project");
   }
 
-  await context.db
+  const updatedProject = await context.db
     .update(project, {
       chainId,
       projectId,
@@ -29,5 +30,12 @@ async function burn({
       erc20Supply: erc20Supply - count,
     }));
 
-  //todo
+  await refreshProjectCashoutCoefficients({
+    db: context.db,
+    chainId,
+    projectId,
+    overflow: updatedProject.balance,
+    tax: 1000n,
+    totalSupply: updatedProject.erc20Supply,
+  });
 }
