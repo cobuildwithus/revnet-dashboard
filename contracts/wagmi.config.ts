@@ -7,6 +7,7 @@ const contractsToGenerate = [
   { name: "JBTokens", address: contracts.JBTokens },
   { name: "JBProjects", address: contracts.JBProjects },
   { name: "JBController", address: contracts.JBController },
+  { name: "JBMultiTerminal", address: contracts.JBMultiTerminal },
 ]
 
 export default defineConfig(() => {

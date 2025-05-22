@@ -2,6 +2,7 @@ import { createConfig, factory } from "ponder";
 import { contracts } from "../contracts/addresses";
 import {
   jbControllerAbi,
+  jbMultiTerminalAbi,
   jbProjectsAbi,
   jbTokensAbi,
   revDeployerAbi,
@@ -41,6 +42,11 @@ export default createConfig({
         parameter: "token",
       }),
       chain: config.ERC20,
+    },
+    JBMultiTerminal: {
+      chain: config.JBMultiTerminal,
+      abi: jbMultiTerminalAbi,
+      address: contracts.JBMultiTerminal,
     },
   },
 });

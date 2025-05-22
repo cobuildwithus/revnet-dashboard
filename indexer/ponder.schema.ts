@@ -16,18 +16,31 @@ export const projectId = (t: PgColumnsBuilders) => ({
   projectId: t.integer().notNull(),
 });
 
+export const paymentsCount = (t: PgColumnsBuilders) => ({
+  paymentsCount: t.integer().notNull().default(0),
+});
+
+export const balance = (t: PgColumnsBuilders) => ({
+  balance: t.bigint().notNull().default(BigInt(0)),
+});
+
 export const project = onchainTable(
   "project",
   (t) => ({
     ...chainId(t),
     ...createdAt(t),
     ...projectId(t),
+    ...balance(t),
+    ...paymentsCount(t),
     isRevnet: t.boolean().notNull(),
     deployer: t.hex().notNull(),
     owner: t.hex().notNull(),
+
     erc20: t.hex(),
     erc20Name: t.text(),
     erc20Symbol: t.text(),
+
+    contributorsCount: t.integer().notNull().default(0),
 
     metadataUri: t.text(),
     metadata: t.json(),
@@ -56,9 +69,9 @@ export const participant = onchainTable(
     ...chainId(t),
     ...projectId(t),
     ...createdAt(t),
+    ...balance(t),
     isRevnet: t.boolean(),
     address: t.hex().notNull(),
-    balance: t.bigint().notNull().default(BigInt(0)),
     firstOwned: t.integer(),
   }),
   (t) => ({

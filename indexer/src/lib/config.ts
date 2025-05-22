@@ -74,6 +74,20 @@ export const config = {
       startBlock: 132080297,
     },
   },
+  JBMultiTerminal: {
+    ethereum: {
+      startBlock: 21863215,
+    },
+    arbitrum: {
+      startBlock: 306858028,
+    },
+    base: {
+      startBlock: 26485049,
+    },
+    optimism: {
+      startBlock: 132080347,
+    },
+  },
 };
 
 export const getChainsAndRpcUrls = () => {
