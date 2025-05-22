@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { project } from "ponder:schema";
+import { getItem, saveItem } from "./kv-store";
 
 /* ── ENV ─────────────────────────────────────────────────────────────── */
 const PINATA_JWT = process.env.PINATA_JWT;
@@ -61,7 +62,16 @@ export async function fetchProjectMetadata(
     return null;
   }
 
-  /* 1️⃣  Try every gateway *without* pinning */
+  const cacheKey = `metadata:${cid}`;
+
+  /* 🔸  Check Redis first */
+  const cached = await getItem<ProjectMetadata>(cacheKey);
+  if (cached) {
+    console.info(`[cache] HIT ${cacheKey}`);
+    return cached;
+  }
+
+  /* 1️⃣  Try each gateway (no pin) */
   for (const [tag, url] of Object.entries({
     dedicated: makeURL.dedicated(cid),
     shared: makeURL.shared(cid),
@@ -69,7 +79,10 @@ export async function fetchProjectMetadata(
   })) {
     try {
       console.info(`[gateway] Trying ${tag} gateway`);
-      return await getJSON<ProjectMetadata>(url);
+      const meta = await getJSON<ProjectMetadata>(url);
+      await saveItem(cacheKey, meta); // ← SAVE
+      console.info(`[cache] SAVE ${cacheKey}`);
+      return meta;
     } catch (e: any) {
       const msg =
         typeof e?.response?.data === "string" ? e.response.data : e.message;
@@ -77,15 +90,18 @@ export async function fetchProjectMetadata(
     }
   }
 
-  /* 2️⃣  Nothing worked → pin, then poll dedicated */
+  /* 2️⃣  Pin, then poll dedicated gateway */
   try {
     await pinByHash(cid);
 
-    for (const delay of [1_000, 2_000, 4_000]) {
+    for (const delay of [1_000, 8_000, 30_000]) {
       console.info(`[poll] Waiting ${delay} ms for cache …`);
       await new Promise((r) => setTimeout(r, delay));
       try {
-        return await getJSON<ProjectMetadata>(makeURL.dedicated(cid));
+        const meta = await getJSON<ProjectMetadata>(makeURL.dedicated(cid));
+        await saveItem(cacheKey, meta); // ← SAVE
+        console.info(`[cache] SAVE ${cacheKey}`);
+        return meta;
       } catch (e: any) {
         const body =
           typeof e?.response?.data === "string" ? e.response.data : "";
@@ -104,10 +120,13 @@ export async function fetchProjectMetadata(
     console.warn("[pinning] Pin attempt failed:", body);
   }
 
-  /* 3️⃣  Final fallback: ipfs.io one more time */
+  /* 3️⃣  Final fallback: ipfs.io again */
   try {
     console.info("[fallback] Final ipfs.io attempt");
-    return await getJSON<ProjectMetadata>(makeURL.ipfsIo(cid));
+    const meta = await getJSON<ProjectMetadata>(makeURL.ipfsIo(cid));
+    await saveItem(cacheKey, meta); // ← SAVE
+    console.info(`[cache] SAVE ${cacheKey}`);
+    return meta;
   } catch (finalErr) {
     console.error("[metadata] All attempts failed:", finalErr?.toString?.());
     return null;
