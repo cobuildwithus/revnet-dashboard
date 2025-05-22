@@ -37,6 +37,7 @@ export const project = onchainTable(
     owner: t.hex().notNull(),
 
     erc20: t.hex(),
+    erc20Supply: t.bigint().notNull().default(BigInt(0)),
     erc20Name: t.text(),
     erc20Symbol: t.text(),
 
