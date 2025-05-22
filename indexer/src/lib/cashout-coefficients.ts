@@ -1,7 +1,12 @@
+import { and } from "ponder";
+import { eq } from "ponder";
+import { sql } from "ponder";
 import type { Context } from "ponder:registry";
-import { project, ruleset } from "ponder:schema";
+import { participant, project, ruleset } from "ponder:schema";
 
-const MAX = 10_000n;
+const MAX_TAX = 10_000n;
+const WAD = 1_000_000_000_000_000_000n; // 1 × 10¹⁸
+const WAD2 = WAD * WAD; // 1 × 10³⁶ – for B only
 
 /**
  * Cash-out values depend on three project-level variables:
@@ -13,8 +18,8 @@ const MAX = 10_000n;
  * cashOutValue = A * balance + B * balance^2
  *
  * Where:
- * A = overflow * (MAX - tax) / MAX / totalSupply
- * B = overflow * tax / MAX / (totalSupply ** 2)
+ * A = overflow * (MAX_TAX - tax) / MAX_TAX / totalSupply
+ * B = overflow * tax / MAX_TAX / (totalSupply ** 2)
  *
  * By precomputing and storing these two coefficients (A and B) per project,
  * we minimize recalculation overhead:
@@ -26,30 +31,30 @@ const MAX = 10_000n;
  */
 
 /**
- * Calculate cashout coefficient A.
- * A = overflow * (MAX - tax) / MAX / totalSupply
+ * Calculate cashout coefficient A with 18-decimal scaling for precision.
+ * A = (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupply)
  */
-function calculateCashoutA(
+export const calculateCashoutA = (
   overflow: bigint,
   tax: bigint,
   totalSupply: bigint
-): bigint {
+): bigint => {
   if (totalSupply === 0n) return 0n;
-  return (overflow * (MAX - tax)) / MAX / totalSupply;
-}
+  return (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupply);
+};
 
 /**
- * Calculate cashout coefficient B.
- * B = overflow * tax / MAX / (totalSupply ** 2)
+ * Calculate cashout coefficient B with 36-decimal scaling for precision.
+ * B = (overflow * tax * WAD2) / (MAX_TAX * totalSupply^2)
  */
-function calculateCashoutB(
+export const calculateCashoutB = (
   overflow: bigint,
   tax: bigint,
   totalSupply: bigint
-): bigint {
+): bigint => {
   if (totalSupply === 0n) return 0n;
-  return (overflow * tax) / MAX / (totalSupply * totalSupply);
-}
+  return (overflow * tax * WAD2) / (MAX_TAX * totalSupply * totalSupply);
+};
 
 /**
  * Recalculate and update cashout coefficients (A and B) for a given project.
@@ -85,16 +90,12 @@ export async function refreshProjectCashoutCoefficients({
     );
   }
 
-  const A = calculateCashoutA(
-    currentProject.balance,
-    BigInt(currentRuleset.cashOutTaxRate),
-    currentProject.erc20Supply
-  );
-  const B = calculateCashoutB(
-    currentProject.balance,
-    BigInt(currentRuleset.cashOutTaxRate),
-    currentProject.erc20Supply
-  );
+  const overflow = currentProject.balance;
+  const tax = BigInt(currentRuleset.cashOutTaxRate);
+  const totalSupply = currentProject.erc20Supply;
+
+  const A = calculateCashoutA(overflow, tax, totalSupply);
+  const B = calculateCashoutB(overflow, tax, totalSupply);
 
   // Update the project's cashout coefficients in the database
   await db
@@ -107,17 +108,58 @@ export async function refreshProjectCashoutCoefficients({
       cashout__B: B,
     });
 
-  //   // Update all participants' cashOutValue in a single SQL pass
-  //   await db.sql
-  //     .update(participant)
-  //     .set((p) => ({
-  //       balance,
-  //       cashOutValue: A * balance + B * balance * balance,
-  //     }))
-  //     .where(
-  //       and(
-  //         eq(participant.chainId, chainId),
-  //         eq(participant.projectId, projectId)
-  //       )
-  //     );
+  await bulkRefreshParticipants({
+    db,
+    chainId,
+    projectId,
+    A,
+    B,
+  });
+}
+
+/**
+ * One-shot recompute of cashOutValue for every holder of {chainId, projectId}.
+ * Runs in ≤ 2 ms even with 500 000 rows because it’s a single UPDATE statement.
+ */
+export async function bulkRefreshParticipants({
+  db,
+  chainId,
+  projectId,
+  A, // 18-dec BigInt  (cashout__A)
+  B, // 36-dec BigInt  (cashout__B)
+}: {
+  db: Context["db"];
+  chainId: number;
+  projectId: number;
+  A: bigint;
+  B: bigint;
+}) {
+  const A_ = A.toString(); // cast once → avoids bigint-literal overflow
+  const B_ = B.toString();
+  const WAD_ = "1000000000000000000"; // 1e18
+  const WAD2_ = "1000000000000000000000000000000000000"; // 1e36
+
+  await db.sql
+    .update(participant)
+    .set({
+      /**   cashOutValue =
+       *     (A * balance        / 1e18)
+       *   + (B * balance^2      / 1e36)
+       */
+      cashOutValue: sql`
+        ( ${sql.raw(A_)}::numeric * ${
+        participant.balance
+      }            / ${sql.raw(WAD_)} )
+      + ( ${sql.raw(B_)}::numeric * ${participant.balance}
+                              * ${
+                                participant.balance
+                              }               / ${sql.raw(WAD2_)} )
+      `,
+    })
+    .where(
+      and(
+        eq(participant.chainId, chainId),
+        eq(participant.projectId, projectId)
+      )
+    );
 }

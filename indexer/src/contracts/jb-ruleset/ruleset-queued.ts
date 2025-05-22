@@ -3,6 +3,7 @@ import { ruleset, project } from "ponder:schema";
 import { unpackMetadata } from "../../lib/ruleset-metadata";
 import { deriveStartFrom } from "../../lib/ruleset-utils";
 import { zeroAddress } from "viem";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on("JBRulesets:RulesetQueued", handleRulesetQueued);
 
@@ -224,4 +225,22 @@ async function handleRulesetQueued({
           : unpackedMetadata.dataHook,
       metadataExtra: unpackedMetadata.metadataExtra,
     });
+
+  const currentTimestamp = new Date().getTime() / 1000;
+  if (currentTimestamp > derivedStart) {
+    await context.db
+      .update(project, {
+        chainId,
+        projectId,
+      })
+      .set({
+        currentRulesetId: rulesetId,
+      });
+
+    await refreshProjectCashoutCoefficients({
+      db: context.db,
+      chainId,
+      projectId,
+    });
+  }
 }
