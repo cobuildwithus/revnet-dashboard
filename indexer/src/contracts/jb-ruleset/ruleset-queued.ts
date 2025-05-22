@@ -87,25 +87,32 @@ async function handleRulesetQueued({
     }
 
     // ---------------------------------------------------------------------
+    //   Derive the actual start time *first* so we can precisely measure
+    //   how many complete cycles have occurred since the base began.
+    // ---------------------------------------------------------------------
+    const _derivedStart = deriveStartFrom(
+      baseRuleset.start,
+      baseRuleset.duration,
+      BigInt(mustStartAtOrAfter)
+    );
+
+    // ---------------------------------------------------------------------
     //        Derive cycle number & cycles elapsed (handles skipped cycles)
     // ---------------------------------------------------------------------
     if (baseRuleset.duration !== 0n) {
-      const gap =
-        BigInt(mustStartAtOrAfter) > baseRuleset.start
-          ? BigInt(mustStartAtOrAfter) - baseRuleset.start
-          : 0n;
-      // floor division gives the number of *full* cycles completed since base
-      cyclesElapsed = Number(gap / baseRuleset.duration);
+      // The number of *whole* cycles between the base start and the derived
+      // start is the authoritative elapsed-cycle count.
+      cyclesElapsed = Number(
+        (_derivedStart - baseRuleset.start) / baseRuleset.duration
+      );
     }
 
-    // For zero-duration bases, a new cycle starts immediately after the base
-    // "instant cycle" completes, so we always increment by exactly one.
-    if (baseRuleset.duration === 0n) {
-      cycleNumber = baseRuleset.cycleNumber + 1;
-    } else {
-      // Otherwise, the new cycle is the base plus the number of full cycles that have elapsed
-      cycleNumber = baseRuleset.cycleNumber + cyclesElapsed;
-    }
+    // For zero-duration bases, a follow-on ruleset is always exactly one cycle
+    // ahead. Otherwise, we advance by the number of elapsed cycles.
+    cycleNumber =
+      baseRuleset.duration === 0n
+        ? baseRuleset.cycleNumber + 1
+        : baseRuleset.cycleNumber + cyclesElapsed;
 
     // -------------------------------------------------------------------
     //              Derive weight when the flag (weight == 1) is used
