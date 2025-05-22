@@ -2,12 +2,10 @@ import axios from "axios";
 import type { project } from "ponder:schema";
 import { getItem, saveItem } from "./kv-store";
 
-/* ── ENV ─────────────────────────────────────────────────────────────── */
 const PINATA_JWT = process.env.PINATA_JWT;
 const DEDICATED_GW =
   process.env.PINATA_GATEWAY_BASE ?? "https://gateway.pinata.cloud/ipfs/";
 
-/* ── TYPES ───────────────────────────────────────────────────────────── */
 type ProjectMetadata = Pick<
   typeof project.$inferSelect,
   | "name"
@@ -24,18 +22,21 @@ type ProjectMetadata = Pick<
   | "discord"
 >;
 
-/* ── CONSTS ──────────────────────────────────────────────────────────── */
 const makeURL = {
   shared: (cid: string) => `https://gateway.pinata.cloud/ipfs/${cid}`,
   dedicated: (cid: string) => `${DEDICATED_GW}${cid}`,
   ipfsIo: (cid: string) => `https://ipfs.io/ipfs/${cid}`,
 };
 
+const UA = {
+  "User-Agent": "Mozilla/5.0 (compatible; metadata-fetch/1.0)",
+  Accept: "application/json",
+};
+
 const AUTH_HDR = { Authorization: `Bearer ${PINATA_JWT}` };
 const JSON_HDR = { ...AUTH_HDR, "Content-Type": "application/json" };
-const GET_OPTS = { headers: AUTH_HDR, timeout: 7_000 };
+const GET_OPTS = { headers: { ...AUTH_HDR, ...UA }, timeout: 7_000 };
 
-/* ── HELPERS ─────────────────────────────────────────────────────────── */
 const getJSON = async <T>(url: string): Promise<T> => {
   const { data } = await axios.get<T>(url, GET_OPTS);
   console.info(`GET ${url} → 200`);
@@ -52,7 +53,6 @@ const pinByHash = async (cid: string) => {
   console.info("[pinByHash] Pin request accepted");
 };
 
-/* ── MAIN ────────────────────────────────────────────────────────────── */
 export async function fetchProjectMetadata(
   uri: string
 ): Promise<ProjectMetadata | null> {
@@ -63,15 +63,12 @@ export async function fetchProjectMetadata(
   }
 
   const cacheKey = `metadata:${cid}`;
-
-  /* 🔸  Check Redis first */
   const cached = await getItem<ProjectMetadata>(cacheKey);
   if (cached) {
     console.info(`[cache] HIT ${cacheKey}`);
     return cached;
   }
 
-  /* 1️⃣  Try each gateway (no pin) */
   for (const [tag, url] of Object.entries({
     dedicated: makeURL.dedicated(cid),
     shared: makeURL.shared(cid),
@@ -80,7 +77,7 @@ export async function fetchProjectMetadata(
     try {
       console.info(`[gateway] Trying ${tag} gateway`);
       const meta = await getJSON<ProjectMetadata>(url);
-      await saveItem(cacheKey, meta); // ← SAVE
+      await saveItem(cacheKey, meta);
       console.info(`[cache] SAVE ${cacheKey}`);
       return meta;
     } catch (e: any) {
@@ -90,7 +87,6 @@ export async function fetchProjectMetadata(
     }
   }
 
-  /* 2️⃣  Pin, then poll dedicated gateway */
   try {
     await pinByHash(cid);
 
@@ -99,7 +95,7 @@ export async function fetchProjectMetadata(
       await new Promise((r) => setTimeout(r, delay));
       try {
         const meta = await getJSON<ProjectMetadata>(makeURL.dedicated(cid));
-        await saveItem(cacheKey, meta); // ← SAVE
+        await saveItem(cacheKey, meta);
         console.info(`[cache] SAVE ${cacheKey}`);
         return meta;
       } catch (e: any) {
@@ -109,7 +105,7 @@ export async function fetchProjectMetadata(
           console.info("[poll] Still propagating (00006) …");
           continue;
         }
-        throw e; // other error → break to fallback
+        throw e;
       }
     }
   } catch (pinErr) {
@@ -120,11 +116,10 @@ export async function fetchProjectMetadata(
     console.warn("[pinning] Pin attempt failed:", body);
   }
 
-  /* 3️⃣  Final fallback: ipfs.io again */
   try {
     console.info("[fallback] Final ipfs.io attempt");
     const meta = await getJSON<ProjectMetadata>(makeURL.ipfsIo(cid));
-    await saveItem(cacheKey, meta); // ← SAVE
+    await saveItem(cacheKey, meta);
     console.info(`[cache] SAVE ${cacheKey}`);
     return meta;
   } catch (finalErr) {
