@@ -41,6 +41,8 @@ export const project = onchainTable(
     erc20Symbol: t.text(),
 
     contributorsCount: t.integer().notNull().default(0),
+    redeemCount: t.integer().notNull().default(0),
+    redeemVolume: t.bigint().notNull().default(BigInt(0)),
 
     metadataUri: t.text(),
     metadata: t.json(),
