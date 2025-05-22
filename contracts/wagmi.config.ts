@@ -6,6 +6,7 @@ const contractsToGenerate = [
   { name: "REVDeployer", address: contracts.REVDeployer },
   { name: "JBTokens", address: contracts.JBTokens },
   { name: "JBProjects", address: contracts.JBProjects },
+  { name: "JBController", address: contracts.JBController },
 ]
 
 export default defineConfig(() => {

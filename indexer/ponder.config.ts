@@ -1,7 +1,12 @@
 import { createConfig } from "ponder";
 import { contracts } from "../contracts/addresses";
-import { jbProjectsAbi, jbTokensAbi, revDeployerAbi } from "./abis";
-import { config, getChainsAndRpcUrls } from "./lib/config";
+import {
+  jbControllerAbi,
+  jbProjectsAbi,
+  jbTokensAbi,
+  revDeployerAbi,
+} from "./abis";
+import { config, getChainsAndRpcUrls } from "./src/lib/config";
 
 export default createConfig({
   ordering: "omnichain",
@@ -21,6 +26,11 @@ export default createConfig({
       chain: config.JBProjects,
       abi: jbProjectsAbi,
       address: contracts.JBProjects,
+    },
+    JBController: {
+      chain: config.JBController,
+      abi: jbControllerAbi,
+      address: contracts.JBController,
     },
   },
 });
