@@ -121,7 +121,7 @@ export async function refreshProjectCashoutCoefficients({
  * One-shot recompute of cashOutValue for every holder of {chainId, projectId}.
  * Runs in ≤ 2 ms even with 500 000 rows because it’s a single UPDATE statement.
  */
-export async function bulkRefreshParticipants({
+async function bulkRefreshParticipants({
   db,
   chainId,
   projectId,
@@ -207,8 +207,8 @@ export async function refreshParticipantCashoutValue({
   const { cashout__A: A, cashout__B: B } = projectRow;
   const balance = participantRow.balance;
 
-  // Compute new cashOutValue
-  const cashOutValue = A * balance + B * balance * balance;
+  // Compute new cashOutValue with proper scaling
+  const cashOutValue = (A * balance) / WAD + (B * balance * balance) / WAD2;
 
   // Update participant's cashOutValue
   await db
