@@ -1,6 +1,7 @@
 import { ponder, type Event, type Context } from "ponder:registry";
 import { ruleset, project } from "ponder:schema";
 import { unpackMetadata } from "../../lib/ruleset-metadata";
+import { deriveStartFrom } from "../../lib/ruleset-utils";
 import { zeroAddress } from "viem";
 
 ponder.on("JBRulesets:RulesetQueued", handleRulesetQueued);
@@ -108,12 +109,23 @@ async function handleRulesetQueued({
     }
   }
 
+  // --------------------------------------------------------------
+  //        Derive the actual start time of the new ruleset
+  // --------------------------------------------------------------
+  const derivedStart = baseRuleset
+    ? deriveStartFrom(
+        baseRuleset.start,
+        baseRuleset.duration,
+        BigInt(mustStartAtOrAfter)
+      )
+    : BigInt(mustStartAtOrAfter);
+
   // ---------------------------------------------------------------------
   //   Determine active status, accounting for zero-duration base rulesets
   // ---------------------------------------------------------------------
-  const now = Math.floor(Date.now() / 1000);
+  const now = BigInt(Math.floor(Date.now() / 1000));
   const isActive =
-    (baseRuleset && baseRuleset.duration === 0n) || mustStartAtOrAfter <= now;
+    (baseRuleset && baseRuleset.duration === 0n) || derivedStart <= now;
 
   // If the base ruleset had duration = 0, it ends immediately once this new
   // ruleset is queued, so mark the base as inactive.
@@ -138,7 +150,7 @@ async function handleRulesetQueued({
       queuedAt: Number(event.block.timestamp),
       cycleNumber,
       basedOnId: previousRuleset?.basedOnId || 0n,
-      start: BigInt(mustStartAtOrAfter),
+      start: derivedStart,
       duration: BigInt(duration),
       weight,
       weightCutPercent,
@@ -174,7 +186,7 @@ async function handleRulesetQueued({
     .onConflictDoUpdate({
       queuedAt: Number(event.block.timestamp),
       cycleNumber,
-      start: BigInt(mustStartAtOrAfter),
+      start: derivedStart,
       duration: BigInt(duration),
       weight,
       weightCutPercent,
