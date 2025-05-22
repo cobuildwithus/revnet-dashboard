@@ -1,4 +1,4 @@
-import { createConfig } from "ponder";
+import { createConfig, factory } from "ponder";
 import { contracts } from "../contracts/addresses";
 import {
   jbControllerAbi,
@@ -7,6 +7,7 @@ import {
   revDeployerAbi,
 } from "./abis";
 import { config, getChainsAndRpcUrls } from "./src/lib/config";
+import { erc20Abi, getAbiItem } from "viem";
 
 export default createConfig({
   ordering: "omnichain",
@@ -31,6 +32,15 @@ export default createConfig({
       chain: config.JBController,
       abi: jbControllerAbi,
       address: contracts.JBController,
+    },
+    ERC20: {
+      abi: erc20Abi,
+      address: factory({
+        address: contracts.JBTokens,
+        event: getAbiItem({ abi: jbTokensAbi, name: "DeployERC20" }),
+        parameter: "token",
+      }),
+      chain: config.ERC20,
     },
   },
 });

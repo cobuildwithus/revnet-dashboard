@@ -60,6 +60,20 @@ export const config = {
       startBlock: 132080314,
     },
   },
+  ERC20: {
+    ethereum: {
+      startBlock: 21863179,
+    },
+    arbitrum: {
+      startBlock: 306857750,
+    },
+    base: {
+      startBlock: 26485001,
+    },
+    optimism: {
+      startBlock: 132080297,
+    },
+  },
 };
 
 export const getChainsAndRpcUrls = () => {

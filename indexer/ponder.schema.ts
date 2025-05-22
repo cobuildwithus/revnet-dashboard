@@ -49,3 +49,32 @@ export const project = onchainTable(
     pk: primaryKey({ columns: [t.chainId, t.projectId] }),
   })
 );
+
+export const participant = onchainTable(
+  "participant",
+  (t) => ({
+    ...chainId(t),
+    ...projectId(t),
+    ...createdAt(t),
+    isRevnet: t.boolean(),
+    address: t.hex().notNull(),
+    balance: t.bigint().notNull().default(BigInt(0)),
+    firstOwned: t.integer(),
+  }),
+  (t) => ({
+    addressIdx: index().on(t.address),
+    pk: primaryKey({ columns: [t.chainId, t.projectId, t.address] }),
+  })
+);
+
+export const ERC20ToProjectId = onchainTable(
+  "_kv_ERC20ToProjectId",
+  (t) => ({
+    erc20: t.hex(),
+    chainId: t.integer().notNull(),
+    projectId: t.integer().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.erc20, table.chainId] }),
+  })
+);

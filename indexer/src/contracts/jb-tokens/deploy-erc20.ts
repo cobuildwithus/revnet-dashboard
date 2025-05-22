@@ -1,5 +1,5 @@
 import { ponder, type Event, type Context } from "ponder:registry";
-import { project } from "ponder:schema";
+import { ERC20ToProjectId, project } from "ponder:schema";
 
 ponder.on("JBTokens:DeployERC20", deployErc20);
 
@@ -32,4 +32,10 @@ async function deployErc20({
       erc20Name: name,
       erc20Symbol: symbol,
     });
+
+  await context.db.insert(ERC20ToProjectId).values({
+    erc20: token,
+    chainId: context.chain.id,
+    projectId: Number(projectId),
+  });
 }
