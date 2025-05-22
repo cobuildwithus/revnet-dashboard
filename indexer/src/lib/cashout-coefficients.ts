@@ -163,3 +163,61 @@ export async function bulkRefreshParticipants({
       )
     );
 }
+
+/**
+ * Recalculate cashOutValue for a single participant after a balance change.
+ * Typically called from ERC20 transfer handler when no mint/burn occurs.
+ */
+export async function refreshParticipantCashoutValue({
+  db,
+  chainId,
+  projectId,
+  participantAddress,
+}: {
+  db: Context["db"];
+  chainId: number;
+  projectId: number;
+  participantAddress: `0x${string}`;
+}) {
+  // Fetch participant's current balance
+  const participantRow = await db.find(participant, {
+    chainId,
+    projectId,
+    address: participantAddress,
+  });
+
+  if (!participantRow) {
+    throw new Error("Participant not found");
+  }
+
+  // Fetch project's current coefficients A and B
+  const projectRow = await db.find(project, {
+    chainId,
+    projectId,
+  });
+
+  if (
+    !projectRow ||
+    projectRow.cashout__A === undefined ||
+    projectRow.cashout__B === undefined
+  ) {
+    throw new Error("Project coefficients not found");
+  }
+
+  const { cashout__A: A, cashout__B: B } = projectRow;
+  const balance = participantRow.balance;
+
+  // Compute new cashOutValue
+  const cashOutValue = A * balance + B * balance * balance;
+
+  // Update participant's cashOutValue
+  await db
+    .update(participant, {
+      chainId,
+      projectId,
+      address: participantAddress,
+    })
+    .set({
+      cashOutValue,
+    });
+}

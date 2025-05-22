@@ -1,5 +1,6 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on("JBMultiTerminal:CashOutTokens", cashOutTokens);
 
@@ -24,4 +25,10 @@ async function cashOutTokens(params: {
       redeemVolume: p.redeemVolume + reclaimAmount,
       balance: p.balance - reclaimAmount,
     }));
+
+  await refreshProjectCashoutCoefficients({
+    db: context.db,
+    chainId,
+    projectId,
+  });
 }

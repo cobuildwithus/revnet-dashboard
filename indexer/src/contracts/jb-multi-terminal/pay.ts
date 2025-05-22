@@ -1,5 +1,6 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { participant, project } from "ponder:schema";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on("JBMultiTerminal:Pay", pay);
 
@@ -30,4 +31,10 @@ async function pay(params: {
       paymentsCount: p.paymentsCount + 1,
       contributorsCount: p.contributorsCount + (payerParticipant ? 0 : 1),
     }));
+
+  await refreshProjectCashoutCoefficients({
+    db: context.db,
+    chainId,
+    projectId,
+  });
 }

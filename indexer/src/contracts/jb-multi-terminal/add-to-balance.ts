@@ -1,5 +1,6 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on("JBMultiTerminal:AddToBalance", addToBalance);
 
@@ -22,4 +23,10 @@ async function addToBalance(params: {
     .set((p) => ({
       balance: p.balance + amount,
     }));
+
+  await refreshProjectCashoutCoefficients({
+    db: context.db,
+    chainId,
+    projectId,
+  });
 }
