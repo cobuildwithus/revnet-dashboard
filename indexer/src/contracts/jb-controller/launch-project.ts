@@ -1,23 +1,24 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
-import { fetchProjectMetadata } from "../lib/project-metadata";
+import { fetchProjectMetadata } from "../../lib/project-metadata";
 
-ponder.on("JBController:SetUri", setUri);
+ponder.on("JBController:LaunchProject", launchProject);
 
-async function setUri(params: {
-  event: Event<"JBController:SetUri">;
-  context: Context<"JBController:SetUri">;
+async function launchProject(params: {
+  event: Event<"JBController:LaunchProject">;
+  context: Context<"JBController:LaunchProject">;
 }) {
   const { event, context } = params;
   const { args } = event;
-  const { projectId: _projectId, uri } = args;
+  const { projectId: _projectId, caller, projectUri } = args;
   const projectId = Number(_projectId);
   const chainId = context.chain.id;
 
-  const metadata = await fetchProjectMetadata(uri);
+  const metadata = await fetchProjectMetadata(projectUri);
 
   await context.db.update(project, { chainId, projectId }).set({
-    metadataUri: uri,
+    deployer: caller,
+    metadataUri: projectUri,
     metadata,
     name: metadata?.name,
     infoUri: metadata?.infoUri,
