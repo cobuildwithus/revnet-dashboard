@@ -17,7 +17,7 @@ async function handleRulesetQueued({
     rulesetId,
     projectId: _projectId,
     duration: _duration,
-    weight,
+    weight: _weight,
     weightCutPercent: _weightCutPercent,
     approvalHook,
     metadata: _metadata,
@@ -30,6 +30,12 @@ async function handleRulesetQueued({
   const duration = Number(_duration);
   const weightCutPercent = Number(_weightCutPercent);
   const mustStartAtOrAfter = Number(_mustStartAtOrAfter);
+
+  // The raw weight value from the event. This may be a flag (1) indicating the
+  // on-chain contract derived the real weight from the previous ruleset. We
+  // replicate that derivation below so the indexed data stores the *actual*
+  // weight value rather than the flag sentinel.
+  let weight = _weight;
 
   // Verify project exists
   const _project = await context.db.find(project, {
@@ -52,8 +58,10 @@ async function handleRulesetQueued({
   });
 
   let cycleNumber = 1;
+  // Track how many cycles have elapsed since the base (defaults to 0)
+  let cyclesElapsed = 0;
   if (previousRuleset && previousRuleset.basedOnId > 0n) {
-    // Get the base ruleset to determine cycle number
+    // Get the base ruleset to determine cycle number and, if needed, derive weight
     const baseRuleset = await context.db.find(ruleset, {
       chainId,
       projectId,
@@ -61,13 +69,7 @@ async function handleRulesetQueued({
     });
     if (baseRuleset) {
       // Derive the number of cycles that have elapsed between the base ruleset
-      // and the intended start of the newly-queued ruleset. This follows the
-      // `deriveCycleNumberFrom` logic found in the Solidity contract:
-      //   cyclesElapsed = (mustStartAtOrAfter - base.start) / base.duration
-      // If the base has duration == 0, it lasts indefinitely until replaced so
-      // the next ruleset is simply the following cycle ( +1 ).
-      // Guard against negative gaps or division by zero.
-      let cyclesElapsed = 0;
+      // and the intended start of the newly-queued ruleset.
       if (baseRuleset.duration !== 0n) {
         const gap =
           BigInt(mustStartAtOrAfter) > baseRuleset.start
@@ -77,6 +79,23 @@ async function handleRulesetQueued({
       }
 
       cycleNumber = baseRuleset.cycleNumber + cyclesElapsed + 1;
+
+      // -------------------------------------------------------------------
+      //              Derive weight when the flag (weight == 1) is used
+      // -------------------------------------------------------------------
+      if (weight === 1n) {
+        const MAX_WEIGHT_CUT_PERCENT = 1_000_000_000n; // JBConstants.MAX_WEIGHT_CUT_PERCENT
+        const baseWeight = baseRuleset.weight;
+        const cutPercent = BigInt(baseRuleset.weightCutPercent);
+        const cutFactor = MAX_WEIGHT_CUT_PERCENT - cutPercent;
+        // Apply the cut once per cycle between base and new (cyclesElapsed+1)
+        let derivedWeight = baseWeight;
+        const cyclesToApply = cyclesElapsed + 1; // always at least 1
+        for (let i = 0; i < cyclesToApply; i++) {
+          derivedWeight = (derivedWeight * cutFactor) / MAX_WEIGHT_CUT_PERCENT;
+        }
+        weight = derivedWeight;
+      }
     }
   }
 
