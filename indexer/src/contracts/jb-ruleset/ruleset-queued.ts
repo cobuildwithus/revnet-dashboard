@@ -60,9 +60,18 @@ async function handleRulesetQueued({
   let cycleNumber = 1;
   // Track how many cycles have elapsed since the base (defaults to 0)
   let cyclesElapsed = 0;
+  // Will hold the base ruleset if we find one – used for zero-duration checks
+  let baseRuleset: {
+    duration: bigint;
+    cycleNumber: number;
+    weight: bigint;
+    weightCutPercent: number;
+    start: bigint;
+    rulesetId: bigint;
+  } | null = null;
   if (previousRuleset && previousRuleset.basedOnId > 0n) {
     // Get the base ruleset to determine cycle number and, if needed, derive weight
-    const baseRuleset = await context.db.find(ruleset, {
+    baseRuleset = await context.db.find(ruleset, {
       chainId,
       projectId,
       rulesetId: previousRuleset.basedOnId,
@@ -99,6 +108,25 @@ async function handleRulesetQueued({
     }
   }
 
+  // ---------------------------------------------------------------------
+  //   Determine active status, accounting for zero-duration base rulesets
+  // ---------------------------------------------------------------------
+  const now = Math.floor(Date.now() / 1000);
+  const isActive =
+    (baseRuleset && baseRuleset.duration === 0n) || mustStartAtOrAfter <= now;
+
+  // If the base ruleset had duration = 0, it ends immediately once this new
+  // ruleset is queued, so mark the base as inactive.
+  if (baseRuleset && baseRuleset.duration === 0n) {
+    await context.db
+      .update(ruleset, {
+        chainId,
+        projectId,
+        rulesetId: baseRuleset.rulesetId,
+      })
+      .set({ isActive: false });
+  }
+
   // Create or update the ruleset with all queue data
   await context.db
     .insert(ruleset)
@@ -118,7 +146,7 @@ async function handleRulesetQueued({
       metadata: _metadata,
       mustStartAtOrAfter: BigInt(mustStartAtOrAfter),
       caller,
-      isActive: mustStartAtOrAfter <= new Date().getTime() / 1000,
+      isActive,
       // Unpacked metadata fields
       reservedPercent: unpackedMetadata.reservedPercent,
       cashOutTaxRate: unpackedMetadata.cashOutTaxRate,
@@ -154,7 +182,7 @@ async function handleRulesetQueued({
       metadata: _metadata,
       mustStartAtOrAfter: BigInt(mustStartAtOrAfter),
       caller,
-      isActive: mustStartAtOrAfter <= new Date().getTime() / 1000,
+      isActive,
       // Update all unpacked metadata fields
       reservedPercent: unpackedMetadata.reservedPercent,
       cashOutTaxRate: unpackedMetadata.cashOutTaxRate,
