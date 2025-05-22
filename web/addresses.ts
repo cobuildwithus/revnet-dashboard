@@ -4,4 +4,5 @@ export const contracts = {
   JBProjects: "0x0b538a02610d7d3cc91ce2870f423e0a34d646ad",
   JBController: "0xb291844f213047eb9e1621ae555b1eae6700d553",
   JBMultiTerminal: "0xdb9644369c79c3633cde70d2df50d827d7dc7dbc",
+  JBRulesets: "0xda86eedb67c6c9fb3e58fe83efa28674d7c89826",
 } as const
