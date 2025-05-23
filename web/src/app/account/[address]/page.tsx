@@ -74,10 +74,6 @@ export default async function AccountPage({ params }: Props) {
               Cash out value
             </div>
             <div className="mt-1 text-2xl font-bold text-primary">Ξ 123.45</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-600 dark:text-green-500">+5%</span>{" "}
-              since last month
-            </p>
           </CardContent>
         </Card>
         <Card>
@@ -86,10 +82,6 @@ export default async function AccountPage({ params }: Props) {
               Borrowable amount
             </div>
             <div className="mt-1 text-2xl font-bold text-primary">Ξ 67.89</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-600 dark:text-green-500">+3%</span>{" "}
-              since last month
-            </p>
           </CardContent>
         </Card>
         <Card>
