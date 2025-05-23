@@ -1,5 +1,5 @@
 import { createConfig, factory } from "ponder";
-import { contracts } from "../contracts/addresses";
+import { contracts } from "./addresses";
 import {
   jbControllerAbi,
   jbMultiTerminalAbi,
