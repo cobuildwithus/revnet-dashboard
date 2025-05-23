@@ -37,14 +37,10 @@ const WAD2 = WAD * WAD; // 1 × 10³⁶ – for B only
 export const calculateCashoutA = (
   overflow: bigint,
   tax: bigint,
-  totalSupply: bigint,
-  pendingReservedTokens: bigint
+  totalSupply: bigint
 ): bigint => {
-  const totalSupplyWithPending = totalSupply + pendingReservedTokens;
-  if (totalSupplyWithPending === 0n) return 0n;
-  return (
-    (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupplyWithPending)
-  );
+  if (totalSupply === 0n) return 0n;
+  return (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupply);
 };
 
 /**
@@ -54,15 +50,10 @@ export const calculateCashoutA = (
 export const calculateCashoutB = (
   overflow: bigint,
   tax: bigint,
-  totalSupply: bigint,
-  pendingReservedTokens: bigint
+  totalSupply: bigint
 ): bigint => {
-  const totalSupplyWithPending = totalSupply + pendingReservedTokens;
-  if (totalSupplyWithPending === 0n) return 0n;
-  return (
-    (overflow * tax * WAD2) /
-    (MAX_TAX * totalSupplyWithPending * totalSupplyWithPending)
-  );
+  if (totalSupply === 0n) return 0n;
+  return (overflow * tax * WAD2) / (MAX_TAX * totalSupply * totalSupply);
 };
 
 /**
@@ -101,21 +92,12 @@ export async function refreshProjectCashoutCoefficients({
 
   const overflow = currentProject.balance;
   const tax = BigInt(currentRuleset.cashOutTaxRate);
-  const totalSupply = currentProject.erc20Supply;
-  const pendingReservedTokens = currentProject.pendingReservedTokens;
 
-  const A = calculateCashoutA(
-    overflow,
-    tax,
-    totalSupply,
-    pendingReservedTokens
-  );
-  const B = calculateCashoutB(
-    overflow,
-    tax,
-    totalSupply,
-    pendingReservedTokens
-  );
+  const totalSupplyWithPending =
+    currentProject.erc20Supply + currentProject.pendingReservedTokens;
+
+  const A = calculateCashoutA(overflow, tax, totalSupplyWithPending);
+  const B = calculateCashoutB(overflow, tax, totalSupplyWithPending);
 
   // Update the project's cashout coefficients in the database
   await db
@@ -139,7 +121,7 @@ export async function refreshProjectCashoutCoefficients({
 
 /**
  * One-shot recompute of cashOutValue for every holder of {chainId, projectId}.
- * Runs in ≤ 2 ms even with 500 000 rows because it’s a single UPDATE statement.
+ * Runs in ≤ 2 ms even with 500 000 rows because it's a single UPDATE statement.
  */
 async function bulkRefreshParticipants({
   db,
@@ -156,24 +138,21 @@ async function bulkRefreshParticipants({
 }) {
   const A_ = A.toString(); // cast once → avoids bigint-literal overflow
   const B_ = B.toString();
-  const WAD_ = "1000000000000000000"; // 1e18
-  const WAD2_ = "1000000000000000000000000000000000000"; // 1e36
+  const WAD_ = WAD.toString();
+  const WAD2_ = WAD2.toString();
 
   await db.sql
     .update(participant)
     .set({
       /**   cashOutValue =
-       *     (A * balance        / 1e18)
-       *   + (B * balance^2      / 1e36)
+       *     (A * balance / 1e18)
+       *   + (B * balance^2 / 1e36)
        */
       cashOutValue: sql`
-        ( ${sql.raw(A_)}::numeric * ${
+        (${sql.raw(A_)}::numeric * ${participant.balance} / ${sql.raw(WAD_)})
+        + (${sql.raw(B_)}::numeric * ${participant.balance} * ${
         participant.balance
-      }            / ${sql.raw(WAD_)} )
-      + ( ${sql.raw(B_)}::numeric * ${participant.balance}
-                              * ${
-                                participant.balance
-                              }               / ${sql.raw(WAD2_)} )
+      } / ${sql.raw(WAD2_)})
       `,
     })
     .where(
