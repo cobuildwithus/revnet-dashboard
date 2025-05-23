@@ -12,8 +12,9 @@ import database from "@/lib/database";
 import { Avatar } from "@/components/ui/avatar";
 import { AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@/components/ui/avatar";
-import { getProfile, getName, getAvatar } from "@/lib/profile-data";
+import { getProfile } from "@/lib/profile-data";
 import { CopyableAddress } from "@/components/copyable-address";
+import { parseIpfsUri } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -38,8 +39,23 @@ export default async function AccountPage({ params }: Props) {
       balance: true,
       projectId: true,
       chainId: true,
+      project: {
+        select: {
+          name: true,
+          erc20Symbol: true,
+          erc20: true,
+          logoUri: true,
+        },
+      },
     },
   });
+
+  // Calculate totals
+  const totalCashOutValue = participants.reduce(
+    (sum, p) => sum + Number(p.cashOutValue),
+    0
+  );
+  const totalRevnets = participants.length;
 
   return (
     <main className="p-8">
@@ -72,7 +88,9 @@ export default async function AccountPage({ params }: Props) {
             <div className="text-sm font-medium text-muted-foreground">
               Cash out value
             </div>
-            <div className="mt-1 text-2xl font-bold text-primary">Ξ 123.45</div>
+            <div className="mt-1 text-2xl font-bold text-primary">
+              Ξ {(totalCashOutValue / 1e18).toFixed(4)}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -80,7 +98,9 @@ export default async function AccountPage({ params }: Props) {
             <div className="text-sm font-medium text-muted-foreground">
               Borrowable amount
             </div>
-            <div className="mt-1 text-2xl font-bold text-primary">Ξ 67.89</div>
+            <div className="mt-1 text-2xl font-bold text-primary">
+              Ξ {((totalCashOutValue * 0.5) / 1e18).toFixed(4)}
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -88,7 +108,9 @@ export default async function AccountPage({ params }: Props) {
             <div className="text-sm font-medium text-muted-foreground">
               Revnets
             </div>
-            <div className="mt-1 text-2xl font-bold text-primary">4</div>
+            <div className="mt-1 text-2xl font-bold text-primary">
+              {totalRevnets}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -109,77 +131,84 @@ export default async function AccountPage({ params }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {[
-                {
-                  ticker: "$NANA",
-                  name: "Bananapus",
-                  balance: "123.45",
-                  networks: ["mainnet"],
-                  cash: "45.67",
-                  borrow: "12.34",
-                },
-                {
-                  ticker: "$REV",
-                  name: "Revnet Network",
-                  balance: "678.90",
-                  networks: ["mainnet", "arbitrum"],
-                  cash: "234.56",
-                  borrow: "78.90",
-                },
-                {
-                  ticker: "$BAN",
-                  name: "Banny Network",
-                  balance: "50.00",
-                  networks: ["base"],
-                  cash: "25.00",
-                  borrow: "5.00",
-                },
-                {
-                  ticker: "$CPN",
-                  name: "Croptop Publishing Network",
-                  balance: "10.00",
-                  networks: ["optimism"],
-                  cash: "5.00",
-                  borrow: "1.00",
-                },
-              ].map((token) => (
-                <TableRow key={token.ticker}>
-                  <TableCell>
-                    <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold">
-                      {token.ticker.substring(1, 3)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{token.ticker}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {token.name}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{token.balance}</div>
-                      <div className="flex mt-1 space-x-1">
-                        {token.networks.map((network) => (
+              {participants.map((participant) => {
+                const cashOutValueEth = Number(participant.cashOutValue) / 1e18;
+                const borrowableAmount = cashOutValueEth * 0.5;
+                const chainName =
+                  participant.chainId === 1
+                    ? "mainnet"
+                    : participant.chainId === 42161
+                    ? "arbitrum"
+                    : participant.chainId === 8453
+                    ? "base"
+                    : participant.chainId === 10
+                    ? "optimism"
+                    : "ethereum";
+
+                const logoUrl = parseIpfsUri(participant.project.logoUri);
+
+                return (
+                  <TableRow
+                    key={`${participant.chainId}-${participant.projectId}`}
+                  >
+                    <TableCell>
+                      <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold">
+                        {logoUrl ? (
                           <Image
-                            key={network}
-                            src={`https://www.revnet.app/assets/img/logo/${network}.svg`}
-                            alt={network}
+                            src={logoUrl}
+                            alt={participant.project.name || "Token"}
+                            width={32}
+                            height={32}
+                            className="rounded-sm"
+                          />
+                        ) : (
+                          (
+                            participant.project.erc20Symbol ||
+                            participant.project.name ||
+                            "?"
+                          )
+                            .substring(0, 2)
+                            .toUpperCase()
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {participant.project.erc20Symbol ||
+                            participant.project.name ||
+                            "Unknown Token"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {participant.project.name || "Unknown Project"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">
+                          {Number(participant.balance).toFixed(4)}
+                        </div>
+                        <div className="flex mt-1 space-x-1">
+                          <Image
+                            src={`https://www.revnet.app/assets/img/logo/${chainName}.svg`}
+                            alt={chainName}
                             width={16}
                             height={16}
                             className="rounded"
                           />
-                        ))}
+                        </div>
                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">Ξ {token.cash}</TableCell>
-                  <TableCell className="font-medium">
-                    Ξ {token.borrow}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      Ξ {cashOutValueEth.toFixed(4)}
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      Ξ {borrowableAmount.toFixed(4)}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
