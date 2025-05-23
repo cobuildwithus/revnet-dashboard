@@ -20,6 +20,7 @@ export function AddressSearch() {
     (addr: string) => {
       if (isValidEthAddress(addr)) {
         router.push(`/account/${addr}`);
+        setAddress(""); // Clear the input after navigation
       }
     },
     [isValidEthAddress, router]

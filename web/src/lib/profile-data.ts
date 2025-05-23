@@ -1,5 +1,7 @@
 "use server";
 
+import { unstable_cache } from "next/cache";
+
 interface IdentityAggregate {
   name?: string;
   avatar?: string;
@@ -59,9 +61,9 @@ async function queryWhiskGraphQL(
   return result.data;
 }
 
-export async function getProfile(
+const getProfileUncached = async (
   address: string
-): Promise<IdentityAggregate | null> {
+): Promise<IdentityAggregate | null> => {
   try {
     const query = `
       query GetIdentity($address: String!) {
@@ -81,9 +83,14 @@ export async function getProfile(
     console.error("Error fetching profile:", error);
     return null;
   }
-}
+};
 
-export async function getName(address: string): Promise<string | null> {
+export const getProfile = unstable_cache(getProfileUncached, ["profile"], {
+  revalidate: 3600, // Cache for 1 hour
+  tags: ["profile"],
+});
+
+const getNameUncached = async (address: string): Promise<string | null> => {
   try {
     const profile = await getProfile(address);
     return profile?.name || null;
@@ -91,9 +98,14 @@ export async function getName(address: string): Promise<string | null> {
     console.error("Error fetching name:", error);
     return null;
   }
-}
+};
 
-export async function getAvatar(address: string): Promise<string | null> {
+export const getName = unstable_cache(getNameUncached, ["name"], {
+  revalidate: 3600, // Cache for 1 hour
+  tags: ["name"],
+});
+
+const getAvatarUncached = async (address: string): Promise<string | null> => {
   try {
     const profile = await getProfile(address);
     return profile?.avatar || null;
@@ -101,9 +113,14 @@ export async function getAvatar(address: string): Promise<string | null> {
     console.error("Error fetching avatar:", error);
     return null;
   }
-}
+};
 
-export async function getBio(address: string): Promise<string | null> {
+export const getAvatar = unstable_cache(getAvatarUncached, ["avatar"], {
+  revalidate: 3600, // Cache for 1 hour
+  tags: ["avatar"],
+});
+
+const getBioUncached = async (address: string): Promise<string | null> => {
   try {
     const profile = await getProfile(address);
     return profile?.bio || null;
@@ -111,4 +128,9 @@ export async function getBio(address: string): Promise<string | null> {
     console.error("Error fetching bio:", error);
     return null;
   }
-}
+};
+
+export const getBio = unstable_cache(getBioUncached, ["bio"], {
+  revalidate: 3600, // Cache for 1 hour
+  tags: ["bio"],
+});
