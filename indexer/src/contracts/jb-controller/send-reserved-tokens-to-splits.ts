@@ -1,5 +1,6 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
+import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
 
 ponder.on(
   "JBController:SendReservedTokensToSplits",
@@ -19,4 +20,10 @@ async function sendReservedTokensToSplits(params: {
   await context.db.update(project, { chainId, projectId }).set((p) => ({
     pendingReservedTokens: p.pendingReservedTokens - tokenCount,
   }));
+
+  await refreshProjectCashoutCoefficients({
+    db: context.db,
+    chainId,
+    projectId,
+  });
 }
