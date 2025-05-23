@@ -50,6 +50,8 @@ export const project = onchainTable(
     redeemCount: t.integer().notNull().default(0),
     redeemVolume: t.bigint().notNull().default(BigInt(0)),
 
+    pendingReservedTokens: t.bigint().notNull().default(BigInt(0)),
+
     metadataUri: t.text(),
     metadata: t.json(),
     name: t.text(),
