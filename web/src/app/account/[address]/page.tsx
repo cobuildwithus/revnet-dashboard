@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -9,6 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
+import database from "@/lib/database";
+import { Name, Avatar } from "@paperclip-labs/whisk-sdk/identity";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -17,42 +19,55 @@ interface Props {
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
 
-  const ensName = "revnet.eth";
+  const participants = await database.participant.findMany({
+    where: {
+      address: address,
+    },
+  });
+
+  console.log(participants);
 
   return (
     <main className="p-8">
       <div className="flex items-center space-x-4 mb-8">
-        <Avatar className="size-16">
-          <AvatarImage src={`https://placehold.co/64`} alt="Avatar" />
-          <AvatarFallback className="text-lg">RE</AvatarFallback>
-        </Avatar>
+        <Avatar address={address as `0x${string}`} size={30} />
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">{ensName}</h1>
+          <h1 className="text-2xl font-semibold text-foreground">
+            <Name address={address as `0x${string}`} />
+          </h1>
           <p className="text-sm text-muted-foreground">{address}</p>
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         <Card>
           <CardContent>
-            <div className="text-sm font-medium text-muted-foreground">Cash out value</div>
+            <div className="text-sm font-medium text-muted-foreground">
+              Cash out value
+            </div>
             <div className="mt-1 text-2xl font-bold text-primary">Ξ 123.45</div>
             <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-600 dark:text-green-500">+5%</span> since last month
+              <span className="text-green-600 dark:text-green-500">+5%</span>{" "}
+              since last month
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent>
-            <div className="text-sm font-medium text-muted-foreground">Borrowable amount</div>
+            <div className="text-sm font-medium text-muted-foreground">
+              Borrowable amount
+            </div>
             <div className="mt-1 text-2xl font-bold text-primary">Ξ 67.89</div>
             <p className="text-xs text-muted-foreground mt-1">
-              <span className="text-green-600 dark:text-green-500">+3%</span> since last month
+              <span className="text-green-600 dark:text-green-500">+3%</span>{" "}
+              since last month
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent>
-            <div className="text-sm font-medium text-muted-foreground">Revnets</div>
+            <div className="text-sm font-medium text-muted-foreground">
+              Revnets
+            </div>
             <div className="mt-1 text-2xl font-bold text-primary">4</div>
           </CardContent>
         </Card>
@@ -66,7 +81,7 @@ export default async function AccountPage({ params }: Props) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-16"></TableHead>
+                <TableHead className="w-16" />
                 <TableHead>Token</TableHead>
                 <TableHead>Balance</TableHead>
                 <TableHead>Cash out value</TableHead>
@@ -117,7 +132,9 @@ export default async function AccountPage({ params }: Props) {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-medium">{token.ticker}</span>
-                      <span className="text-xs text-muted-foreground">{token.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {token.name}
+                      </span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -138,7 +155,9 @@ export default async function AccountPage({ params }: Props) {
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">Ξ {token.cash}</TableCell>
-                  <TableCell className="font-medium">Ξ {token.borrow}</TableCell>
+                  <TableCell className="font-medium">
+                    Ξ {token.borrow}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

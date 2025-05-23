@@ -3,6 +3,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/user-menu";
 import { WagmiProvider } from "@/lib/wagmi-provider";
+import "@paperclip-labs/whisk-sdk/styles.css";
 import { Search } from "lucide-react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -12,11 +13,13 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Revnet Dashboard",
-  description: "Portfolio WIP",
+  title: "Revnet Dash",
+  description: "View your Revnet portfolio",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} antialiased`}>
