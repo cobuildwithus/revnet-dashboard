@@ -9,7 +9,11 @@ import {
 } from "@/components/ui/table";
 import Image from "next/image";
 import database from "@/lib/database";
-import { Name, Avatar } from "@paperclip-labs/whisk-sdk/identity";
+import { Avatar } from "@/components/ui/avatar";
+import { AvatarImage } from "@/components/ui/avatar";
+import { AvatarFallback } from "@/components/ui/avatar";
+import { getProfile, getName, getAvatar } from "@/lib/profile-data";
+import { CopyableAddress } from "@/components/copyable-address";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -20,9 +24,19 @@ export default async function AccountPage({ params }: Props) {
 
   const addressLower = address.toLowerCase() as `0x${string}`;
 
+  // Fetch profile data from Whisk API
+  const profile = await getProfile(address);
+  const displayName = profile?.name || "revnet.eth";
+  const avatarUrl = profile?.avatar;
+
   const participants = await database.participant.findMany({
     where: {
       address: addressLower,
+    },
+    select: {
+      address: true,
+      cashOutValue: true,
+      balance: true,
     },
   });
 
@@ -31,12 +45,26 @@ export default async function AccountPage({ params }: Props) {
   return (
     <main className="p-8">
       <div className="flex items-center space-x-4 mb-8">
-        <Avatar address={addressLower} size={64} />
+        <Avatar className={profile?.bio ? "size-20" : "size-16"}>
+          <AvatarImage
+            src={avatarUrl || "https://placehold.co/64"}
+            alt="Avatar"
+          />
+          <AvatarFallback className={profile?.bio ? "text-xl" : "text-lg"}>
+            {displayName.slice(0, 2).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
         <div>
           <h1 className="text-2xl font-semibold text-foreground">
-            <Name address={addressLower} />
+            {displayName}
           </h1>
-          <p className="text-sm text-muted-foreground">{address}</p>
+          <CopyableAddress
+            address={address}
+            className="text-sm text-muted-foreground"
+          />
+          {profile?.bio && (
+            <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
