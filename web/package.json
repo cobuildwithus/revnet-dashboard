@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "prisma generate --no-hints"
+    "db:generate": "prisma generate --no-hints",
+    "prebuild": "prisma generate --no-hints"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
