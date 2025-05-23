@@ -24,7 +24,6 @@ export default async function AccountPage({ params }: Props) {
 
   const addressLower = address.toLowerCase() as `0x${string}`;
 
-  // Fetch profile data from Whisk API
   const profile = await getProfile(address);
   const displayName = profile?.name || "revnet.eth";
   const avatarUrl = profile?.avatar;
@@ -37,10 +36,10 @@ export default async function AccountPage({ params }: Props) {
       address: true,
       cashOutValue: true,
       balance: true,
+      projectId: true,
+      chainId: true,
     },
   });
-
-  console.log(participants);
 
   return (
     <main className="p-8">
