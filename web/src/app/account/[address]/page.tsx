@@ -12,30 +12,13 @@ export default async function AccountPage({ params }: Props) {
   const { address } = await params;
   const addressLower = address.toLowerCase() as `0x${string}`;
 
-  const profile = await getProfile(address);
+  const [profile, participants] = await Promise.all([
+    getProfile(address),
+    getParticipants(addressLower),
+  ]);
+
   const displayName = profile?.name || "revnet.eth";
   const avatarUrl = profile?.avatar;
-
-  const participants = await database.participant.findMany({
-    where: {
-      address: addressLower,
-    },
-    select: {
-      address: true,
-      cashOutValue: true,
-      balance: true,
-      projectId: true,
-      chainId: true,
-      project: {
-        select: {
-          name: true,
-          erc20Symbol: true,
-          erc20: true,
-          logoUri: true,
-        },
-      },
-    },
-  });
 
   // Calculate totals
   const totalCashOutValue = participants.reduce(
@@ -61,4 +44,28 @@ export default async function AccountPage({ params }: Props) {
       <TokensTable participants={participants} />
     </main>
   );
+}
+
+async function getParticipants(address: `0x${string}`) {
+  return database.participant.findMany({
+    where: {
+      address,
+    },
+    select: {
+      address: true,
+      cashOutValue: true,
+      balance: true,
+      projectId: true,
+      chainId: true,
+      project: {
+        select: {
+          name: true,
+          erc20Symbol: true,
+          erc20: true,
+          logoUri: true,
+          chainId: true,
+        },
+      },
+    },
+  });
 }
