@@ -9,24 +9,15 @@ import {
 } from "@/components/ui/table";
 import Image from "next/image";
 import { formatBalance, parseIpfsUri } from "@/lib/utils";
-import type { Decimal } from "@prisma/client/runtime/library";
-
-interface Participant {
-  address: string;
-  cashOutValue: bigint;
-  balance: Decimal;
-  projectId: number;
-  chainId: number;
-  project: {
-    name: string | null;
-    erc20Symbol: string | null;
-    erc20: string | null;
-    logoUri: string | null;
-  };
-}
+import type { Participant, Project } from "@prisma/revnet";
 
 interface TokensTableProps {
-  participants: Participant[];
+  participants: (Pick<
+    Participant,
+    "chainId" | "projectId" | "balance" | "cashOutValue"
+  > & {
+    project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
+  })[];
 }
 
 function getChainName(chainId: number): string {
