@@ -37,10 +37,14 @@ const WAD2 = WAD * WAD; // 1 × 10³⁶ – for B only
 export const calculateCashoutA = (
   overflow: bigint,
   tax: bigint,
-  totalSupply: bigint
+  totalSupply: bigint,
+  pendingReservedTokens: bigint
 ): bigint => {
-  if (totalSupply === 0n) return 0n;
-  return (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupply);
+  const totalSupplyWithPending = totalSupply + pendingReservedTokens;
+  if (totalSupplyWithPending === 0n) return 0n;
+  return (
+    (overflow * (MAX_TAX - tax) * WAD) / (MAX_TAX * totalSupplyWithPending)
+  );
 };
 
 /**
@@ -50,10 +54,15 @@ export const calculateCashoutA = (
 export const calculateCashoutB = (
   overflow: bigint,
   tax: bigint,
-  totalSupply: bigint
+  totalSupply: bigint,
+  pendingReservedTokens: bigint
 ): bigint => {
-  if (totalSupply === 0n) return 0n;
-  return (overflow * tax * WAD2) / (MAX_TAX * totalSupply * totalSupply);
+  const totalSupplyWithPending = totalSupply + pendingReservedTokens;
+  if (totalSupplyWithPending === 0n) return 0n;
+  return (
+    (overflow * tax * WAD2) /
+    (MAX_TAX * totalSupplyWithPending * totalSupplyWithPending)
+  );
 };
 
 /**
@@ -93,9 +102,20 @@ export async function refreshProjectCashoutCoefficients({
   const overflow = currentProject.balance;
   const tax = BigInt(currentRuleset.cashOutTaxRate);
   const totalSupply = currentProject.erc20Supply;
+  const pendingReservedTokens = currentProject.pendingReservedTokens;
 
-  const A = calculateCashoutA(overflow, tax, totalSupply);
-  const B = calculateCashoutB(overflow, tax, totalSupply);
+  const A = calculateCashoutA(
+    overflow,
+    tax,
+    totalSupply,
+    pendingReservedTokens
+  );
+  const B = calculateCashoutB(
+    overflow,
+    tax,
+    totalSupply,
+    pendingReservedTokens
+  );
 
   // Update the project's cashout coefficients in the database
   await db
