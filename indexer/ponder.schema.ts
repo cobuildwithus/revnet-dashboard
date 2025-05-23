@@ -87,6 +87,7 @@ export const participant = onchainTable(
   }),
   (t) => ({
     addressIdx: index().on(t.address),
+    chainIdProjectIdIdx: index().on(t.chainId, t.projectId),
     pk: primaryKey({ columns: [t.chainId, t.projectId, t.address] }),
   })
 );
