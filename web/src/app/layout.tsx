@@ -1,9 +1,8 @@
+import { AddressSearch } from "@/components/address-search";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/user-menu";
 import { WagmiProvider } from "@/lib/wagmi-provider";
-import { Search } from "lucide-react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
@@ -37,7 +36,9 @@ export default function RootLayout({
                     fill="none"
                     className="w-8"
                     xmlns="http://www.w3.org/2000/svg"
+                    aria-label="Revnet Dash logo"
                   >
+                    <title>Revnet Dash logo</title>
                     <path
                       d="M287.451 69.6339L173.138 0.0389404L150.509 58.7621L54.0338 0.0389404L0.246094 139.618L142.096 80.5446L119.35 139.618L287.451 69.6339Z"
                       fill="currentColor"
@@ -47,14 +48,7 @@ export default function RootLayout({
               </div>
 
               <div className="flex justify-center">
-                <div className="relative w-full max-w-md">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                  <Input
-                    type="text"
-                    placeholder="ETH address or ENS name"
-                    className="pl-10 md:min-w-96 w-full"
-                  />
-                </div>
+                <AddressSearch />
               </div>
 
               <div className="flex items-center justify-end space-x-2 md:space-x-4">

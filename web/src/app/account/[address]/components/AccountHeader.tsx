@@ -33,7 +33,11 @@ export function AccountHeader({
           address={address}
           className="text-sm text-muted-foreground"
         />
-        {bio && <p className="text-sm text-muted-foreground mt-1">{bio}</p>}
+        {bio && (
+          <p className="text-sm text-muted-foreground mt-1 break-words max-w-md">
+            {bio}
+          </p>
+        )}
       </div>
     </div>
   );
