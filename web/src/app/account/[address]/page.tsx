@@ -18,9 +18,11 @@ interface Props {
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
 
+  const addressLower = address.toLowerCase() as `0x${string}`;
+
   const participants = await database.participant.findMany({
     where: {
-      address: address,
+      address: addressLower,
     },
   });
 
@@ -29,10 +31,10 @@ export default async function AccountPage({ params }: Props) {
   return (
     <main className="p-8">
       <div className="flex items-center space-x-4 mb-8">
-        <Avatar address={address as `0x${string}`} size={30} />
+        <Avatar address={addressLower} size={64} />
         <div>
           <h1 className="text-2xl font-semibold text-foreground">
-            <Name address={address as `0x${string}`} />
+            <Name address={addressLower} />
           </h1>
           <p className="text-sm text-muted-foreground">{address}</p>
         </div>

@@ -3,7 +3,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Input } from "@/components/ui/input";
 import { UserMenu } from "@/components/user-menu";
 import { WagmiProvider } from "@/lib/wagmi-provider";
-import "@paperclip-labs/whisk-sdk/styles.css";
 import { Search } from "lucide-react";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
