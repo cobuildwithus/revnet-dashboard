@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { Participant, Project } from "@prisma/revnet";
+import type { Participant, Project } from "@prisma/client";
 import { RevnetTableRow } from "./revnet-table-row";
 
 interface RevnetsTableProps {
