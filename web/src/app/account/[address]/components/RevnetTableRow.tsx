@@ -17,7 +17,7 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
   const { borrowableAmount, isLoading } = useBorrowableAmount({
     chainId: participant.chainId,
     revnetId: BigInt(participant.projectId),
-    collateralCount: BigInt(participant.balance.toString()),
+    collateralCount: BigInt(participant.balance),
   });
 
   const cashOutValueEth = formatBalance(Number(participant.cashOutValue));
