@@ -110,6 +110,20 @@ export const config = {
       startBlock: 132116331,
     },
   },
+  JBSuckersRegistry: {
+    ethereum: {
+      startBlock: 21863660,
+    },
+    arbitrum: {
+      startBlock: 306881281,
+    },
+    base: {
+      startBlock: 26487986,
+    },
+    optimism: {
+      startBlock: 132083296,
+    },
+  },
 };
 
 export const getChainsAndRpcUrls = () => {

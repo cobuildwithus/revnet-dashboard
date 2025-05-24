@@ -45,3 +45,52 @@ export function getChainName(chainId: number): string {
       return "ethereum";
   }
 }
+
+// Revnet grouping utilities
+export function groupParticipantsBySuckerGroup<
+  T extends {
+    chainId: number;
+    projectId: number;
+    project: { suckerGroupId: string | null };
+  }
+>(participants: T[]) {
+  return participants.reduce((groups, participant) => {
+    const groupId =
+      participant.project.suckerGroupId ||
+      `${participant.chainId}-${participant.projectId}`;
+
+    if (!groups[groupId]) {
+      groups[groupId] = [];
+    }
+    groups[groupId].push(participant);
+    return groups;
+  }, {} as Record<string, T[]>);
+}
+
+export function aggregateGroupData<
+  T extends {
+    chainId: number;
+    balance: number;
+    cashOutValue: bigint | number;
+  }
+>(participants: T[]) {
+  return {
+    totalBalance: participants.reduce((sum, p) => sum + p.balance, 0),
+    totalCashOutValue: participants.reduce(
+      (sum, p) => sum + Number(p.cashOutValue),
+      0
+    ),
+    uniqueChains: [...new Set(participants.map((p) => p.chainId))] as number[],
+  };
+}
+
+export function getGroupDisplayInfo(participants: { chainId: number }[]) {
+  const uniqueChains = [...new Set(participants.map((p) => p.chainId))];
+  const chainNames = uniqueChains.map((chainId) => getChainName(chainId));
+
+  return {
+    isMultiChain: participants.length > 1,
+    chainCount: uniqueChains.length,
+    chainNames,
+  };
+}

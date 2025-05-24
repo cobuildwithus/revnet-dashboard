@@ -110,6 +110,29 @@ export const project = onchainTable(
   })
 );
 
+export const suckerGroup = onchainTable("sucker_group", (t) => ({
+  id: t
+    .text()
+    .$default(() => generateId())
+    .primaryKey(),
+  projects: t.text().array().notNull().default([]),
+  addresses: t.hex().array().notNull().default([]),
+  createdAt: t.integer().notNull(),
+}));
+
+export const projectRelations = relations(project, ({ one, many }) => ({
+  suckerGroup: one(suckerGroup, {
+    fields: [project.suckerGroupId],
+    references: [suckerGroup.id],
+  }),
+  loans: many(loan),
+  borrowLoanEvents: many(borrowLoanEvent),
+  repayLoanEvents: many(repayLoanEvent),
+  liquidateLoanEvents: many(liquidateLoanEvent),
+  reallocateLoanEvents: many(reallocateLoanEvent),
+  suckers: many(sucker),
+}));
+
 export const participant = onchainTable(
   "participant",
   (t) => ({
@@ -320,3 +343,22 @@ export const ERC20ToProjectId = onchainTable(
     pk: primaryKey({ columns: [table.erc20, table.chainId] }),
   })
 );
+
+export const sucker = onchainTable(
+  "sucker",
+  (t) => ({
+    ...projectId(t),
+    ...chainId(t),
+    address: t.hex().notNull(),
+  }),
+  (t) => ({
+    pk: primaryKey({ columns: [t.projectId, t.chainId, t.address] }),
+  })
+);
+
+export const suckerRelations = relations(sucker, ({ one }) => ({
+  project: one(project, {
+    fields: [sucker.projectId, sucker.chainId],
+    references: [project.projectId, project.chainId],
+  }),
+}));

@@ -4,76 +4,92 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
 import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
 import type { Participant, Project } from "@prisma/client";
-import { useBorrowableAmount } from "@/lib/hooks/rev-loans/use-borrowable-amount";
+import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from "react";
 
 interface RevnetTableRowProps {
-  participant: Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
+  suckerGroupId: string;
+  participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
     balance: number;
     project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
-  };
+  })[];
+  totalBalance: number;
+  totalCashOutValue: number;
+  uniqueChains: number[];
 }
 
-export function RevnetTableRow({ participant }: RevnetTableRowProps) {
-  const { borrowableAmount, isLoading } = useBorrowableAmount({
-    chainId: participant.chainId,
-    revnetId: BigInt(participant.projectId),
-    collateralCount: BigInt(participant.balance),
-  });
+export function RevnetTableRow({
+  suckerGroupId,
+  participants,
+  totalBalance,
+  totalCashOutValue,
+  uniqueChains,
+}: RevnetTableRowProps) {
+  // Use first project - they're all the same in a sucker group
+  const project = participants[0].project;
 
-  const cashOutValueEth = formatBalance(Number(participant.cashOutValue));
-  const borrowableAmountEth = formatBalance(Number(borrowableAmount || 0));
-  const chainName = getChainName(participant.chainId);
-  const logoUrl = parseIpfsUri(participant.project.logoUri);
+  // Prepare params for multiple borrowable amounts
+  const borrowableParams = useMemo(
+    () =>
+      participants.map((participant) => ({
+        chainId: participant.chainId,
+        revnetId: BigInt(participant.projectId),
+        collateralCount: BigInt(participant.balance),
+      })),
+    [participants]
+  );
+
+  const { totalBorrowableAmount, isLoading } =
+    useMultipleBorrowableAmounts(borrowableParams);
+
+  const cashOutValueEth = formatBalance(totalCashOutValue);
+  const borrowableAmountEth = formatBalance(totalBorrowableAmount);
+  const chainNames = uniqueChains.map((chainId) => getChainName(chainId));
+  const logoUrl = parseIpfsUri(project.logoUri);
+
+  const displayName = project.erc20Symbol || project.name || "Unknown Token";
+  const description = project.name || "Unknown Project";
 
   return (
-    <TableRow key={`${participant.chainId}-${participant.projectId}`}>
+    <TableRow key={suckerGroupId}>
       <TableCell>
         <div className="flex items-center gap-3">
           <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold flex-shrink-0">
             {logoUrl ? (
               <Image
                 src={logoUrl}
-                alt={participant.project.name || "Token"}
+                alt={project.name || "Token"}
                 width={32}
                 height={32}
                 className="rounded-sm"
               />
             ) : (
-              (
-                participant.project.erc20Symbol ||
-                participant.project.name ||
-                "?"
-              )
+              (project.erc20Symbol || project.name || "?")
                 .substring(0, 2)
                 .toUpperCase()
             )}
           </div>
           <div className="flex flex-col">
-            <span className="font-medium">
-              {participant.project.erc20Symbol ||
-                participant.project.name ||
-                "Unknown Token"}
-            </span>
-            <span className="text-xs text-muted-foreground">
-              {participant.project.name || "Unknown Project"}
-            </span>
+            <span className="font-medium">{displayName}</span>
+            <span className="text-xs text-muted-foreground">{description}</span>
           </div>
         </div>
       </TableCell>
       <TableCell>
         <div>
-          <div className="font-medium">
-            {formatBalance(Number(participant.balance))}
-          </div>
+          <div className="font-medium">{formatBalance(totalBalance)}</div>
           <div className="flex mt-1 space-x-1">
-            <Image
-              src={`https://www.revnet.app/assets/img/logo/${chainName}.svg`}
-              alt={chainName}
-              width={16}
-              height={16}
-              className="rounded"
-            />
+            {chainNames.map((chainName) => (
+              <Image
+                key={chainName}
+                src={`https://www.revnet.app/assets/img/logo/${chainName}.svg`}
+                alt={chainName}
+                width={16}
+                height={16}
+                className="rounded"
+              />
+            ))}
           </div>
         </div>
       </TableCell>

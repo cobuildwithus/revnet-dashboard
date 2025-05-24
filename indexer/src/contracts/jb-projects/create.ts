@@ -1,5 +1,5 @@
 import { type Context, type Event, ponder } from "ponder:registry";
-import { project } from "ponder:schema";
+import { project, suckerGroup } from "ponder:schema";
 
 ponder.on("JBProjects:Create", create);
 
@@ -11,12 +11,27 @@ async function create(params: {
   const { args, block } = event;
   const { projectId, owner, caller } = args;
 
+  const chainId = context.chain.id;
+  const projectIdNum = Number(projectId);
+
+  // Create a unique identifier for the project using chainId and projectId
+  const projectUniqueId = `${chainId}-${projectIdNum}`;
+
+  // Create a default sucker group for the project
+  const newSuckerGroup = await context.db.insert(suckerGroup).values({
+    projects: [projectUniqueId],
+    addresses: [] as `0x${string}`[],
+    createdAt: Number(block.timestamp),
+  });
+
+  // Create the project with the suckerGroupId
   await context.db.insert(project).values({
-    chainId: context.chain.id,
-    projectId: Number(projectId),
+    chainId,
+    projectId: projectIdNum,
     isRevnet: false,
     createdAt: Number(block.timestamp),
     owner,
     deployer: caller,
+    suckerGroupId: newSuckerGroup.id,
   });
 }
