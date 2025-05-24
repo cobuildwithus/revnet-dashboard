@@ -5,6 +5,7 @@ import {
   jbMultiTerminalAbi,
   jbProjectsAbi,
   jbRulesetsAbi,
+  jbSuckersRegistryAbi,
   jbTokensAbi,
   revDeployerAbi,
   revLoansAbi,
@@ -59,6 +60,11 @@ export default createConfig({
       chain: config.RevLoans,
       abi: revLoansAbi,
       address: contracts.RevLoans,
+    },
+    JBSuckersRegistry: {
+      chain: config.JBSuckersRegistry,
+      abi: jbSuckersRegistryAbi,
+      address: contracts.JBSuckersRegistry,
     },
   },
   blocks: {
