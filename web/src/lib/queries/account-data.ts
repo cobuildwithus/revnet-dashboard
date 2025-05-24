@@ -58,6 +58,7 @@ async function getParticipants(address: `0x${string}`) {
           erc20: true,
           logoUri: true,
           chainId: true,
+          suckerGroupId: true,
         },
       },
     },

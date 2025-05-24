@@ -8,15 +8,35 @@ import {
 } from "@/components/ui/table";
 import type { Participant, Project } from "@prisma/client";
 import { RevnetTableRow } from "./revnet-table-row";
+import {
+  groupParticipantsBySuckerGroup,
+  aggregateGroupData,
+} from "@/lib/utils";
 
 interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
-    project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
+    project: Pick<
+      Project,
+      "name" | "erc20Symbol" | "logoUri" | "chainId" | "suckerGroupId"
+    >;
     balance: number;
   })[];
 }
 
 export function RevnetsTable({ participants }: RevnetsTableProps) {
+  const groupedParticipants = groupParticipantsBySuckerGroup(participants);
+
+  const groupedData = Object.entries(groupedParticipants)
+    .map(([suckerGroupId, groupParticipants]) => {
+      const aggregated = aggregateGroupData(groupParticipants);
+      return {
+        suckerGroupId,
+        participants: groupParticipants,
+        ...aggregated,
+      };
+    })
+    .sort((a, b) => b.totalBalance - a.totalBalance);
+
   return (
     <Card className="mt-8">
       <CardHeader>
@@ -33,10 +53,14 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {participants.map((participant) => (
+            {groupedData.map((group) => (
               <RevnetTableRow
-                key={`${participant.chainId}-${participant.projectId}`}
-                participant={participant}
+                key={group.suckerGroupId}
+                suckerGroupId={group.suckerGroupId}
+                participants={group.participants}
+                totalBalance={group.totalBalance}
+                totalCashOutValue={group.totalCashOutValue}
+                uniqueChains={group.uniqueChains}
               />
             ))}
           </TableBody>
