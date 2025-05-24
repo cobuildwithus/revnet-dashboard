@@ -28,7 +28,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WagmiProvider>
-            <header className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4 py-4 px-4 md:px-8 bg-background shadow-sm sticky top-0">
+            <header className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4 py-4 px-4 md:px-8 bg-background shadow-sm sticky top-0 min-h-[64px]">
               <div className="flex justify-start">
                 <Link href="/">
                   <svg
@@ -51,7 +51,7 @@ export default function RootLayout({
                 <AddressSearch />
               </div>
 
-              <div className="flex items-center justify-end space-x-2 md:space-x-4">
+              <div className="flex items-center justify-end space-x-2 md:space-x-4 min-h-[40px]">
                 <ThemeToggle />
                 <UserMenu />
               </div>

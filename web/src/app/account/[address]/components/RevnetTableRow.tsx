@@ -24,7 +24,7 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
 
   const cashOutValueEth = formatBalance(Number(participant.cashOutValue));
   const borrowableAmountEth = isLoading
-    ? "Loading..."
+    ? "Calculating..."
     : formatBalance(Number(borrowableAmount || 0));
   const chainName = getChainName(participant.chainId);
   const logoUrl = parseIpfsUri(participant.project.logoUri);
