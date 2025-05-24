@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="mt-12 border-t bg-background py-16">
       <div className="mx-auto px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-5 max-w-screen-xl mx-auto">
           {/* 1 — Revnet */}
           <div className="space-y-4">
             <h3 className="font-medium">Revnet</h3>

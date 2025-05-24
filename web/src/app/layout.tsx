@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import "./globals.css";
+import Footer from "@/components/footer";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
@@ -46,6 +47,7 @@ export default function RootLayout({
               </div>
             </header>
             {children}
+            <Footer />
           </WagmiProvider>
         </ThemeProvider>
       </body>

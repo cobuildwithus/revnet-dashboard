@@ -3,7 +3,6 @@
 import { useAccount } from "wagmi";
 import { AccountView } from "@/components/account-view";
 import { GlobalStats } from "@/components/global-stats";
-import Footer from "@/components/footer";
 
 export default function Home() {
   const { address, isConnected, isConnecting, isReconnecting } = useAccount();
@@ -23,8 +22,6 @@ export default function Home() {
           </div>
         )}
       </div>
-
-      <Footer />
     </div>
   );
 }

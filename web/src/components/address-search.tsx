@@ -46,11 +46,11 @@ export function AddressSearch() {
 
   return (
     <div className="relative w-full max-w-md">
-      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+      <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
       <Input
         type="text"
         placeholder="ETH address"
-        className="pl-10 md:min-w-96 w-full"
+        className="w-full pl-10 md:min-w-96"
         value={address}
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}
