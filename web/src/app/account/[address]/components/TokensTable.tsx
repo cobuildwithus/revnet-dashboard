@@ -25,14 +25,14 @@ export function TokensTable({ participants }: TokensTableProps) {
   return (
     <Card className="mt-8">
       <CardHeader>
-        <CardTitle>Your Tokens</CardTitle>
+        <CardTitle>Your Revnets</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-16" />
-              <TableHead>Token</TableHead>
+              <TableHead>Revnet</TableHead>
               <TableHead>Balance</TableHead>
               <TableHead>Cash out value</TableHead>
               <TableHead>Borrowable amount</TableHead>
