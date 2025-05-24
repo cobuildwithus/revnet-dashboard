@@ -23,7 +23,10 @@ export async function getAccountData(address: string) {
     0
   );
 
-  const totalRevnets = participants.length;
+  const uniqueSuckerGroupIds = new Set(
+    participants.map((p) => p.project.suckerGroupId).filter((id) => id !== null)
+  );
+  const totalRevnets = uniqueSuckerGroupIds.size;
 
   return {
     profile: {
@@ -44,6 +47,7 @@ async function getParticipants(address: `0x${string}`) {
   const participants = await database.participant.findMany({
     where: {
       address,
+      isRevnet: true,
     },
     select: {
       address: true,

@@ -55,6 +55,16 @@ view Project {
   @@schema("onchain")
 }
 
+view SuckerGroup {
+  id        String   @id
+  projects  String[]
+  addresses String[] @db.VarChar(42)
+  createdAt Int      @map("created_at")
+
+  @@map("sucker_group")
+  @@schema("onchain")
+}
+
 view Participant {
   chainId      Int     @map("chain_id")
   projectId    Int     @map("project_id")

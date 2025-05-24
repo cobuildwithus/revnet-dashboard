@@ -4,13 +4,22 @@ import { unstable_cache } from "next/cache";
 import database from "@/lib/database";
 
 const getTotalRevnetsUncached = async (): Promise<number> => {
-  const count = await database.project.count({
+  const revnetProjects = await database.project.findMany({
     where: {
       isRevnet: true,
     },
+    select: {
+      suckerGroupId: true,
+    },
   });
 
-  return count;
+  const uniqueSuckerGroupIds = new Set(
+    revnetProjects
+      .map((project) => project.suckerGroupId)
+      .filter((id) => id !== null)
+  );
+
+  return uniqueSuckerGroupIds.size;
 };
 
 export const getTotalRevnets = unstable_cache(
