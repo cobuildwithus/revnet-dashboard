@@ -1,8 +1,8 @@
 "use client";
 
 import { useAccount } from "wagmi";
-import { AccountView } from "@/components/AccountView";
-import { GlobalStats } from "@/components/GlobalStats";
+import { AccountView } from "@/components/account-view";
+import { GlobalStats } from "@/components/global-stats";
 import Footer from "@/components/footer";
 
 export default function Home() {

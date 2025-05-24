@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Participant, Project } from "@prisma/revnet";
-import { RevnetTableRow } from "./RevnetTableRow";
+import { RevnetTableRow } from "./revnet-table-row";
 
 interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {

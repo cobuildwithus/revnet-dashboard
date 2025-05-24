@@ -1,4 +1,4 @@
-import { AccountView } from "@/components/AccountView";
+import { AccountView } from "@/components/account-view";
 
 interface Props {
   params: Promise<{ address: string }>;

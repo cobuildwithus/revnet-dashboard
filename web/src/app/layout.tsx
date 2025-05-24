@@ -1,5 +1,5 @@
 import { AddressSearch } from "@/components/address-search";
-import { Logo } from "@/components/Logo";
+import { Logo } from "@/components/logo";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
