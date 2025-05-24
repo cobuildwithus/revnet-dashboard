@@ -29,7 +29,7 @@ export default async function AccountPage({ params }: Props) {
   const totalRevnets = participants.length;
 
   return (
-    <main className="p-8">
+    <main className="py-12 px-8 max-w-screen-xl mx-auto">
       <AccountHeader
         address={address}
         displayName={displayName}
