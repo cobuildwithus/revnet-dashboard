@@ -3,7 +3,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
 import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
-import type { Participant, Project } from "@prisma/revnet";
+import type { Participant, Project } from "@prisma/client";
 import { useBorrowableAmount } from "@/lib/hooks/rev-loans/use-borrowable-amount";
 import { Skeleton } from "@/components/ui/skeleton";
 
