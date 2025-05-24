@@ -26,7 +26,6 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-16" />
               <TableHead>Revnet</TableHead>
               <TableHead>Balance</TableHead>
               <TableHead>Net worth</TableHead>

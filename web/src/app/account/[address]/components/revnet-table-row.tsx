@@ -29,32 +29,36 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
   return (
     <TableRow key={`${participant.chainId}-${participant.projectId}`}>
       <TableCell>
-        <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold">
-          {logoUrl ? (
-            <Image
-              src={logoUrl}
-              alt={participant.project.name || "Token"}
-              width={32}
-              height={32}
-              className="rounded-sm"
-            />
-          ) : (
-            (participant.project.erc20Symbol || participant.project.name || "?")
-              .substring(0, 2)
-              .toUpperCase()
-          )}
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex flex-col">
-          <span className="font-medium">
-            {participant.project.erc20Symbol ||
-              participant.project.name ||
-              "Unknown Token"}
-          </span>
-          <span className="text-xs text-muted-foreground">
-            {participant.project.name || "Unknown Project"}
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold flex-shrink-0">
+            {logoUrl ? (
+              <Image
+                src={logoUrl}
+                alt={participant.project.name || "Token"}
+                width={32}
+                height={32}
+                className="rounded-sm"
+              />
+            ) : (
+              (
+                participant.project.erc20Symbol ||
+                participant.project.name ||
+                "?"
+              )
+                .substring(0, 2)
+                .toUpperCase()
+            )}
+          </div>
+          <div className="flex flex-col">
+            <span className="font-medium">
+              {participant.project.erc20Symbol ||
+                participant.project.name ||
+                "Unknown Token"}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {participant.project.name || "Unknown Project"}
+            </span>
+          </div>
         </div>
       </TableCell>
       <TableCell>
