@@ -29,7 +29,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <WagmiProvider>
-            <header className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4 py-4 px-4 md:px-8 bg-background shadow-sm sticky top-0 min-h-[64px]">
+            <header className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4 py-4 px-4 md:px-8 bg-background shadow-sm sticky top-0 z-50 min-h-[64px]">
               <div className="flex justify-start">
                 <Link href="/">
                   <Logo />
