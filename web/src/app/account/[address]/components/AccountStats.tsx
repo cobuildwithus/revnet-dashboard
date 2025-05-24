@@ -19,7 +19,7 @@ export function AccountStats({
       <Card>
         <CardContent>
           <div className="text-sm font-medium text-muted-foreground">
-            Cash out value
+            Net worth
           </div>
           <div className="mt-1 text-2xl font-bold text-primary">
             Ξ {cashOutValueEth.toFixed(4)}
@@ -29,7 +29,7 @@ export function AccountStats({
       <Card>
         <CardContent>
           <div className="text-sm font-medium text-muted-foreground">
-            Borrowable amount
+            Borrowable
           </div>
           <div className="mt-1 text-2xl font-bold text-primary">
             Ξ {borrowableAmountEth.toFixed(4)}

@@ -5,7 +5,7 @@ import { ConnectKitProvider } from "connectkit";
 import { useTheme } from "next-themes";
 import { PropsWithChildren } from "react";
 import { WagmiProvider as WagmiProviderBase } from "wagmi";
-import { wagmiConfig } from "./wagmi-config";
+import { wagmiConfig } from "./wagmi.config";
 
 const queryClient = new QueryClient();
 

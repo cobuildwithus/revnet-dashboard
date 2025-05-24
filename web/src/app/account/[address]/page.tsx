@@ -2,7 +2,7 @@ import database from "@/lib/database";
 import { getProfile } from "@/lib/profile-data";
 import { AccountHeader } from "./components/AccountHeader";
 import { AccountStats } from "./components/AccountStats";
-import { TokensTable } from "./components/TokensTable";
+import { RevnetsTable } from "./components/RevnetsTable";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -12,24 +12,21 @@ export default async function AccountPage({ params }: Props) {
   const { address } = await params;
   const addressLower = address.toLowerCase() as `0x${string}`;
 
-  const [profile, participantsWithBorrowableAmounts] = await Promise.all([
+  const [profile, participants] = await Promise.all([
     getProfile(address),
-    getParticipantsWithBorrowableAmounts(addressLower),
+    getParticipants(addressLower),
   ]);
 
   const displayName = profile?.name || "revnet.eth";
   const avatarUrl = profile?.avatar;
 
   // Calculate totals
-  const totalCashOutValue = participantsWithBorrowableAmounts.reduce(
+  const totalCashOutValue = participants.reduce(
     (sum, p) => sum + Number(p.cashOutValue),
     0
   );
-  const totalBorrowableAmount = participantsWithBorrowableAmounts.reduce(
-    (sum, p) => sum + Number(p.borrowableAmount),
-    0
-  );
-  const totalRevnets = participantsWithBorrowableAmounts.length;
+
+  const totalRevnets = participants.length;
 
   return (
     <main className="p-8">
@@ -42,16 +39,16 @@ export default async function AccountPage({ params }: Props) {
 
       <AccountStats
         totalCashOutValue={totalCashOutValue}
-        totalBorrowableAmount={totalBorrowableAmount}
         totalRevnets={totalRevnets}
+        totalBorrowableAmount={0}
       />
 
-      <TokensTable participants={participantsWithBorrowableAmounts} />
+      <RevnetsTable participants={participants} />
     </main>
   );
 }
 
-async function getParticipantsWithBorrowableAmounts(address: `0x${string}`) {
+async function getParticipants(address: `0x${string}`) {
   const participants = await database.participant.findMany({
     where: {
       address,
@@ -62,7 +59,6 @@ async function getParticipantsWithBorrowableAmounts(address: `0x${string}`) {
       balance: true,
       projectId: true,
       chainId: true,
-      borrowableAmount: true,
       project: {
         select: {
           name: true,
@@ -75,5 +71,8 @@ async function getParticipantsWithBorrowableAmounts(address: `0x${string}`) {
     },
   });
 
-  return participants;
+  return participants.map((participant) => ({
+    ...participant,
+    balance: Number(participant.balance),
+  }));
 }

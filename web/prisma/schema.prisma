@@ -65,7 +65,6 @@ view Participant {
   address      String  @db.VarChar(42)
   firstOwned   Int?    @map("first_owned")
   cashOutValue BigInt  @default(0) @map("cash_out_value")
-  borrowableAmount BigInt  @default(0) @map("borrowable_amount")
 
   project Project @relation(fields: [chainId, projectId], references: [chainId, projectId])
 
