@@ -50,7 +50,6 @@ export function RevnetTableRow({
 
   const cashOutValueEth = formatBalance(totalCashOutValue);
   const borrowableAmountEth = formatBalance(totalBorrowableAmount);
-  const chainNames = uniqueChains.map((chainId) => getChainName(chainId));
   const logoUrl = parseIpfsUri(project.logoUri);
 
   const displayName = project.erc20Symbol || project.name || "Unknown Token";
