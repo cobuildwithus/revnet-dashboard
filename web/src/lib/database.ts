@@ -4,11 +4,11 @@ const prismaClientSingleton = () => {
   return new PrismaClient();
 };
 
-declare global {
-  var prisma: ReturnType<typeof prismaClientSingleton> | undefined;
-}
+declare const globalThis: {
+  prisma: ReturnType<typeof prismaClientSingleton> | undefined;
+};
 
-const database = global.prisma ?? prismaClientSingleton();
+const database = globalThis.prisma ?? prismaClientSingleton();
 
 export default database;
 
