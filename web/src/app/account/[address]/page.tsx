@@ -1,9 +1,4 @@
-import database from "@/lib/database";
-import { getProfile } from "@/lib/profile-data";
-import { getBorrowableAmount } from "@/lib/hooks/rev-loans/get-borrowable-amount";
-import { AccountHeader } from "./components/AccountHeader";
-import { AccountStats } from "./components/AccountStats";
-import { RevnetsTable } from "./components/RevnetsTable";
+import { AccountView } from "@/components/AccountView";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -11,88 +6,6 @@ interface Props {
 
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
-  const addressLower = address.toLowerCase() as `0x${string}`;
 
-  const [profile, participants] = await Promise.all([
-    getProfile(address),
-    getParticipants(addressLower),
-  ]);
-
-  const displayName = profile?.name || "revnet.eth";
-  const avatarUrl = profile?.avatar;
-
-  // Calculate totals
-  const totalCashOutValue = participants.reduce(
-    (sum, p) => sum + Number(p.cashOutValue),
-    0
-  );
-
-  const totalBorrowableAmount = participants.reduce(
-    (sum, p) => sum + Number(p.borrowableAmount),
-    0
-  );
-
-  const totalRevnets = participants.length;
-
-  return (
-    <main className="py-12 px-8 max-w-screen-xl mx-auto">
-      <AccountHeader
-        address={address}
-        displayName={displayName}
-        avatarUrl={avatarUrl}
-        bio={profile?.bio}
-      />
-
-      <AccountStats
-        totalCashOutValue={totalCashOutValue}
-        totalRevnets={totalRevnets}
-        totalBorrowableAmount={totalBorrowableAmount}
-      />
-
-      <RevnetsTable participants={participants} />
-    </main>
-  );
-}
-
-async function getParticipants(address: `0x${string}`) {
-  const participants = await database.participant.findMany({
-    where: {
-      address,
-    },
-    select: {
-      address: true,
-      cashOutValue: true,
-      balance: true,
-      projectId: true,
-      chainId: true,
-      project: {
-        select: {
-          name: true,
-          erc20Symbol: true,
-          erc20: true,
-          logoUri: true,
-          chainId: true,
-        },
-      },
-    },
-  });
-
-  // Get borrowable amounts for all participants
-  const participantsWithBorrowableAmount = await Promise.all(
-    participants.map(async (participant) => {
-      const borrowableAmount = await getBorrowableAmount(
-        participant.chainId,
-        participant.projectId,
-        Number(participant.balance)
-      );
-
-      return {
-        ...participant,
-        balance: Number(participant.balance),
-        borrowableAmount: Number(borrowableAmount),
-      };
-    })
-  );
-
-  return participantsWithBorrowableAmount;
+  return <AccountView address={address} />;
 }
