@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMarketCap } from "@/lib/hooks/use-market-cap";
 import { useTotalLoaned } from "@/lib/hooks/use-total-loaned";
 import { useTotalRevnets } from "@/lib/hooks/use-total-revnets";
-import { Logo } from "./logo";
+import { Logo } from "./revnet-logo";
 
 export function GlobalStats() {
   const { marketCap, isLoading: marketCapLoading } = useMarketCap();

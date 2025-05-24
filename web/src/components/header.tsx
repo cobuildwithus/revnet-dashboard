@@ -1,7 +1,7 @@
 "use client";
 
 import { AddressSearch } from "@/components/address-search";
-import { Logo } from "@/components/logo";
+import { Logo } from "@/components/revnet-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
 import Link from "next/link";
