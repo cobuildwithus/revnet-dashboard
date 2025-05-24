@@ -12,14 +12,8 @@ export default function Home() {
       <div className="flex-1">
         <GlobalStats />
 
-        {isConnected && address && !isConnecting && !isReconnecting ? (
+        {isConnected && address && !isConnecting && !isReconnecting && (
           <AccountView address={address} />
-        ) : (
-          <div className="flex flex-col items-center justify-center py-24 mx-auto px-8">
-            <p className="text-muted-foreground">
-              Connect your wallet to view your portfolio
-            </p>
-          </div>
         )}
       </div>
     </div>
