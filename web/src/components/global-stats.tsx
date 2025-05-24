@@ -18,7 +18,7 @@ export function GlobalStats() {
     : "0";
 
   return (
-    <div className="w-full mx-auto px-8 py-12">
+    <div className="w-full mx-auto px-4 md:px-8 py-12">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-4">
           <Logo className="w-12 h-12" title="Revdash logo" />
