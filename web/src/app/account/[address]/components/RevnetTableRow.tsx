@@ -75,11 +75,13 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
       </TableCell>
       <TableCell className="font-medium">Ξ {cashOutValueEth}</TableCell>
       <TableCell className="font-medium">
-        {isLoading ? (
-          <Skeleton rounded="rounded-sm" height={20} width="90px" />
-        ) : (
-          `Ξ ${borrowableAmountEth}`
-        )}
+        <div className="w-20 h-5 flex items-center">
+          {isLoading ? (
+            <Skeleton height={16} width="64px" rounded="rounded-sm" />
+          ) : (
+            <span>Ξ {borrowableAmountEth}</span>
+          )}
+        </div>
       </TableCell>
     </TableRow>
   );
