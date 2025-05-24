@@ -20,7 +20,9 @@ export function Header() {
       </div>
 
       <div className="flex items-center justify-end space-x-2 md:space-x-4 min-h-[40px]">
-        <ThemeToggle />
+        <div className="hidden md:block">
+          <ThemeToggle />
+        </div>
         <UserMenu />
       </div>
     </header>

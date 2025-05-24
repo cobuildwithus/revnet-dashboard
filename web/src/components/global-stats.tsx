@@ -35,7 +35,7 @@ export function GlobalStats() {
         <Card>
           <CardContent>
             <div className="text-sm font-medium text-muted-foreground">
-              Total Market Cap
+              Market Cap
             </div>
             <div className="mt-1 text-2xl font-bold text-primary">
               {marketCapLoading ? (

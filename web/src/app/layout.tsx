@@ -9,7 +9,7 @@ import Footer from "@/components/footer";
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Revnet Dash",
+  title: "Revdash",
   description: "View your Revnet portfolio",
 };
 
