@@ -10,11 +10,9 @@ import type { Participant, Project } from "@prisma/revnet";
 import { RevnetTableRow } from "./RevnetTableRow";
 
 interface RevnetsTableProps {
-  participants: (Pick<
-    Participant,
-    "chainId" | "projectId" | "balance" | "cashOutValue"
-  > & {
+  participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
     project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
+    balance: number;
   })[];
 }
 

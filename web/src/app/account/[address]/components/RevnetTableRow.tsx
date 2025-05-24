@@ -7,10 +7,8 @@ import type { Participant, Project } from "@prisma/revnet";
 import { useBorrowableAmount } from "@/lib/hooks/rev-loans/use-borrowable-amount";
 
 interface RevnetTableRowProps {
-  participant: Pick<
-    Participant,
-    "chainId" | "projectId" | "balance" | "cashOutValue"
-  > & {
+  participant: Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
+    balance: number;
     project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
   };
 }
