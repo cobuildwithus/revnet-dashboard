@@ -2,21 +2,29 @@
 
 import { useAccount } from "wagmi";
 import { AccountView } from "@/components/AccountView";
+import { GlobalStats } from "@/components/GlobalStats";
+import Footer from "@/components/footer";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
 
   return (
-    <div className="min-h-screen">
-      {isConnected && address ? (
-        <AccountView address={address} />
-      ) : (
-        <div className="flex flex-col items-center justify-center h-screen">
-          <p className="text-muted-foreground">
-            Connect your wallet to view your portfolio
-          </p>
-        </div>
-      )}
+    <div className="min-h-screen flex flex-col max-w-screen-xl mx-auto">
+      <div className="flex-1">
+        <GlobalStats />
+
+        {isConnected && address ? (
+          <AccountView address={address} />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 mx-auto px-8">
+            <p className="text-muted-foreground">
+              Connect your wallet to view your portfolio
+            </p>
+          </div>
+        )}
+      </div>
+
+      <Footer />
     </div>
   );
 }

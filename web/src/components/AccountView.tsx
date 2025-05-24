@@ -15,7 +15,7 @@ export function AccountView({ address }: AccountViewProps) {
 
   if (isLoading) {
     return (
-      <main className="py-12 px-8 max-w-screen-xl mx-auto">
+      <main className="py-12 px-8 mx-auto">
         <div className="space-y-8">
           <div className="space-y-4">
             <Skeleton height={40} width="300px" />
@@ -34,7 +34,7 @@ export function AccountView({ address }: AccountViewProps) {
 
   if (error) {
     return (
-      <main className="py-12 px-8 max-w-screen-xl mx-auto">
+      <main className="py-12 px-8 mx-auto">
         <div className="text-center">
           <p className="text-red-500">
             Error loading account data. {error.message}
@@ -49,7 +49,7 @@ export function AccountView({ address }: AccountViewProps) {
   }
 
   return (
-    <main className="py-12 px-8 max-w-screen-xl mx-auto">
+    <main className="py-12 px-8 mx-auto">
       <AccountHeader
         address={address}
         displayName={accountData.profile.name}

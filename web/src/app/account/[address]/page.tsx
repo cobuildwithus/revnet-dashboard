@@ -7,5 +7,9 @@ interface Props {
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
 
-  return <AccountView address={address} />;
+  return (
+    <div className="max-w-screen-xl mx-auto">
+      <AccountView address={address} />
+    </div>
+  );
 }

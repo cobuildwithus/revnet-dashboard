@@ -15,7 +15,10 @@ const getTotalMarketCapUncached = async (): Promise<string> => {
 
   return result._sum.balance?.toString() || "0";
 };
-
-export const getTotalMarketCap = unstable_cache(getTotalMarketCapUncached, [
-  "total-market-cap",
-]);
+export const getTotalMarketCap = unstable_cache(
+  getTotalMarketCapUncached,
+  ["total-market-cap"],
+  {
+    revalidate: 3600,
+  }
+);

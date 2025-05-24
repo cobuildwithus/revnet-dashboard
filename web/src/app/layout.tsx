@@ -1,4 +1,5 @@
 import { AddressSearch } from "@/components/address-search";
+import { Logo } from "@/components/Logo";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserMenu } from "@/components/user-menu";
@@ -31,19 +32,7 @@ export default function RootLayout({
             <header className="grid grid-cols-[1fr_2fr_1fr] items-center gap-4 py-4 px-4 md:px-8 bg-background shadow-sm sticky top-0 min-h-[64px]">
               <div className="flex justify-start">
                 <Link href="/">
-                  <svg
-                    viewBox="0 0 288 140"
-                    fill="none"
-                    className="w-8"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-label="Revnet Dash logo"
-                  >
-                    <title>Revnet Dash logo</title>
-                    <path
-                      d="M287.451 69.6339L173.138 0.0389404L150.509 58.7621L54.0338 0.0389404L0.246094 139.618L142.096 80.5446L119.35 139.618L287.451 69.6339Z"
-                      fill="currentColor"
-                    />
-                  </svg>
+                  <Logo />
                 </Link>
               </div>
 
