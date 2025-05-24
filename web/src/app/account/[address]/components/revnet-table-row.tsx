@@ -4,7 +4,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
 import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
 import type { Participant, Project } from "@prisma/client";
-import { useBorrowableAmount } from "@/lib/hooks/rev-loans/use-borrowable-amount";
+import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
 
@@ -19,28 +19,6 @@ interface RevnetTableRowProps {
   uniqueChains: number[];
 }
 
-function useTotalBorrowableAmount(
-  participants: RevnetTableRowProps["participants"]
-) {
-  const borrowableQueries = participants.map((participant) =>
-    useBorrowableAmount({
-      chainId: participant.chainId,
-      revnetId: BigInt(participant.projectId),
-      collateralCount: BigInt(participant.balance),
-    })
-  );
-
-  const totalBorrowableAmount = useMemo(() => {
-    return borrowableQueries.reduce((sum, query) => {
-      return sum + Number(query.borrowableAmount || 0);
-    }, 0);
-  }, [borrowableQueries]);
-
-  const isLoading = borrowableQueries.some((query) => query.isLoading);
-
-  return { totalBorrowableAmount, isLoading };
-}
-
 export function RevnetTableRow({
   suckerGroupId,
   participants,
@@ -50,8 +28,20 @@ export function RevnetTableRow({
 }: RevnetTableRowProps) {
   // Use first project - they're all the same in a sucker group
   const project = participants[0].project;
+
+  // Prepare params for multiple borrowable amounts
+  const borrowableParams = useMemo(
+    () =>
+      participants.map((participant) => ({
+        chainId: participant.chainId,
+        revnetId: BigInt(participant.projectId),
+        collateralCount: BigInt(participant.balance),
+      })),
+    [participants]
+  );
+
   const { totalBorrowableAmount, isLoading } =
-    useTotalBorrowableAmount(participants);
+    useMultipleBorrowableAmounts(borrowableParams);
 
   const cashOutValueEth = formatBalance(totalCashOutValue);
   const borrowableAmountEth = formatBalance(totalBorrowableAmount);
