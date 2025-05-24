@@ -56,7 +56,7 @@ export function AddressSearch() {
       <Input
         type="text"
         placeholder="ETH address"
-        className="w-full pl-10 shadow-none"
+        className="w-full pl-10 h-10 shadow-none"
         value={address}
         onChange={handleInputChange}
         onKeyPress={handleKeyPress}

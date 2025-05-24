@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { arbitrum, base, mainnet, optimism } from "viem/chains";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -93,4 +94,24 @@ export function getGroupDisplayInfo(participants: { chainId: number }[]) {
     chainCount: uniqueChains.length,
     chainNames,
   };
+}
+
+export function getRevnetUrl(chainId: number, projectId: number): string {
+  const chainPrefix = getChainPrefix(chainId);
+  return `https://revnet.app/${chainPrefix}:${projectId}`;
+}
+
+function getChainPrefix(chainId: number): string {
+  switch (chainId) {
+    case mainnet.id:
+      return "eth";
+    case optimism.id:
+      return "op";
+    case arbitrum.id:
+      return "arb";
+    case base.id:
+      return "base";
+    default:
+      return "eth"; // fallback to eth
+  }
 }

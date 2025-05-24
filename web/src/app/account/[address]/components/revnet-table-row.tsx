@@ -2,7 +2,12 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
-import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
+import {
+  formatBalance,
+  getChainName,
+  getRevnetUrl,
+  parseIpfsUri,
+} from "@/lib/utils";
 import type { Participant, Project } from "@prisma/client";
 import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -52,9 +57,17 @@ export function RevnetTableRow({
   const description = project.name || "Unknown Project";
 
   return (
-    <TableRow key={suckerGroupId}>
+    <TableRow key={suckerGroupId} className="hover:bg-muted/50">
       <TableCell>
-        <div className="flex items-center gap-3">
+        <a
+          href={getRevnetUrl(
+            participants[0].chainId,
+            participants[0].projectId
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-3"
+        >
           <div className="size-8 bg-muted rounded-sm flex items-center justify-center text-xs font-bold flex-shrink-0">
             {logoUrl ? (
               <Image
@@ -74,22 +87,35 @@ export function RevnetTableRow({
             <span className="font-medium">{displayName}</span>
             <span className="text-xs text-muted-foreground">{description}</span>
           </div>
-        </div>
+        </a>
       </TableCell>
       <TableCell>
         <div>
           <div className="font-medium">{formatBalance(totalBalance)}</div>
           <div className="flex mt-1 space-x-1">
-            {chainNames.map((chainName) => (
-              <Image
-                key={chainName}
-                src={`https://www.revnet.app/assets/img/logo/${chainName}.svg`}
-                alt={chainName}
-                width={16}
-                height={16}
-                className="rounded"
-              />
-            ))}
+            {uniqueChains.map((chainId) => {
+              const chainName = getChainName(chainId);
+              return (
+                <a
+                  key={chainId}
+                  href={getRevnetUrl(
+                    chainId,
+                    participants.find((p) => p.chainId === chainId)
+                      ?.projectId || participants[0].projectId
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Image
+                    src={`https://www.revnet.app/assets/img/logo/${chainName}.svg`}
+                    alt={chainName}
+                    width={16}
+                    height={16}
+                    className="rounded hover:opacity-80 transition-opacity"
+                  />
+                </a>
+              );
+            })}
           </div>
         </div>
       </TableCell>
