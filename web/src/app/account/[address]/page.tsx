@@ -1,5 +1,6 @@
 import database from "@/lib/database";
 import { getProfile } from "@/lib/profile-data";
+import { getBorrowableAmount } from "@/lib/hooks/rev-loans/get-borrowable-amount";
 import { AccountHeader } from "./components/AccountHeader";
 import { AccountStats } from "./components/AccountStats";
 import { RevnetsTable } from "./components/RevnetsTable";
@@ -26,6 +27,11 @@ export default async function AccountPage({ params }: Props) {
     0
   );
 
+  const totalBorrowableAmount = participants.reduce(
+    (sum, p) => sum + Number(p.borrowableAmount),
+    0
+  );
+
   const totalRevnets = participants.length;
 
   return (
@@ -40,7 +46,7 @@ export default async function AccountPage({ params }: Props) {
       <AccountStats
         totalCashOutValue={totalCashOutValue}
         totalRevnets={totalRevnets}
-        totalBorrowableAmount={0}
+        totalBorrowableAmount={totalBorrowableAmount}
       />
 
       <RevnetsTable participants={participants} />
@@ -71,8 +77,22 @@ async function getParticipants(address: `0x${string}`) {
     },
   });
 
-  return participants.map((participant) => ({
-    ...participant,
-    balance: Number(participant.balance),
-  }));
+  // Get borrowable amounts for all participants
+  const participantsWithBorrowableAmount = await Promise.all(
+    participants.map(async (participant) => {
+      const borrowableAmount = await getBorrowableAmount(
+        participant.chainId,
+        participant.projectId,
+        Number(participant.balance)
+      );
+
+      return {
+        ...participant,
+        balance: Number(participant.balance),
+        borrowableAmount: Number(borrowableAmount),
+      };
+    })
+  );
+
+  return participantsWithBorrowableAmount;
 }

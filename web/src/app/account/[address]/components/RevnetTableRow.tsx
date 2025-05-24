@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
 import type { Participant, Project } from "@prisma/revnet";
 import { useBorrowableAmount } from "@/lib/hooks/rev-loans/use-borrowable-amount";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RevnetTableRowProps {
   participant: Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
@@ -21,9 +22,7 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
   });
 
   const cashOutValueEth = formatBalance(Number(participant.cashOutValue));
-  const borrowableAmountEth = isLoading
-    ? "Calculating..."
-    : formatBalance(Number(borrowableAmount || 0));
+  const borrowableAmountEth = formatBalance(Number(borrowableAmount || 0));
   const chainName = getChainName(participant.chainId);
   const logoUrl = parseIpfsUri(participant.project.logoUri);
 
@@ -75,7 +74,13 @@ export function RevnetTableRow({ participant }: RevnetTableRowProps) {
         </div>
       </TableCell>
       <TableCell className="font-medium">Ξ {cashOutValueEth}</TableCell>
-      <TableCell className="font-medium">Ξ {borrowableAmountEth}</TableCell>
+      <TableCell className="font-medium">
+        {isLoading ? (
+          <Skeleton rounded="rounded-sm" height={20} width="90px" />
+        ) : (
+          `Ξ ${borrowableAmountEth}`
+        )}
+      </TableCell>
     </TableRow>
   );
 }
