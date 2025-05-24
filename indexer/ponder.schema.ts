@@ -3,7 +3,17 @@ import {
   onchainTable,
   primaryKey,
   type PgColumnsBuilders,
+  relations,
 } from "ponder";
+import { generateId } from "./src/util/id";
+
+export const uniqueId = (t: PgColumnsBuilders) => ({
+  id: t
+    .text()
+    .notNull()
+    .$default(() => generateId())
+    .primaryKey(),
+});
 
 export const chainId = (t: PgColumnsBuilders) => ({
   chainId: t.integer().notNull(),
@@ -22,6 +32,30 @@ export const paymentsCount = (t: PgColumnsBuilders) => ({
 
 export const balance = (t: PgColumnsBuilders) => ({
   balance: t.bigint().notNull().default(BigInt(0)),
+});
+
+export const timestamp = (t: PgColumnsBuilders) => ({
+  timestamp: t.integer().notNull(),
+});
+export const logIndex = (t: PgColumnsBuilders) => ({
+  logIndex: t.integer().notNull(),
+});
+export const txHash = (t: PgColumnsBuilders) => ({ txHash: t.hex().notNull() });
+export const caller = (t: PgColumnsBuilders) => ({ caller: t.hex().notNull() });
+export const from = (t: PgColumnsBuilders) => ({ from: t.hex().notNull() });
+export const suckerGroupId = (t: PgColumnsBuilders) => ({
+  suckerGroupId: t.text().notNull(),
+});
+
+// Common event parameters helper
+export const eventParams = (t: PgColumnsBuilders) => ({
+  ...uniqueId(t),
+  ...chainId(t),
+  ...txHash(t),
+  ...timestamp(t),
+  ...caller(t),
+  ...from(t),
+  ...logIndex(t),
 });
 
 export const project = onchainTable(
@@ -66,6 +100,9 @@ export const project = onchainTable(
     description: t.text(),
     tags: t.text().array(),
     projectTagline: t.text(),
+
+    // For loan calculations
+    suckerGroupId: t.text(),
   }),
   (t) => ({
     projectIdx: index().on(t.projectId),
@@ -84,11 +121,125 @@ export const participant = onchainTable(
     address: t.hex().notNull(),
     firstOwned: t.integer(),
     cashOutValue: t.bigint().notNull().default(BigInt(0)),
+    borrowableAmount: t.bigint().notNull().default(BigInt(0)),
   }),
   (t) => ({
     addressIdx: index().on(t.address),
     chainIdProjectIdIdx: index().on(t.chainId, t.projectId),
     pk: primaryKey({ columns: [t.chainId, t.projectId, t.address] }),
+  })
+);
+
+// Basic loan entity for tracking borrowable amounts
+export const loan = onchainTable(
+  "loan",
+  (t) => ({
+    id: t.bigint().notNull(),
+    ...projectId(t),
+    ...chainId(t),
+    ...createdAt(t),
+    borrowAmount: t.bigint().notNull(),
+    collateral: t.bigint().notNull(),
+    sourceFeeAmount: t.bigint().notNull(),
+    prepaidDuration: t.integer().notNull(),
+    prepaidFeePercent: t.integer().notNull(),
+    beneficiary: t.hex().notNull(),
+    owner: t.hex().notNull(),
+    token: t.hex().notNull(),
+    terminal: t.hex().notNull(),
+    tokenUri: t.text(),
+  }),
+  (t) => ({
+    pk: primaryKey({ columns: [t.id, t.chainId] }),
+  })
+);
+
+export const loanRelations = relations(loan, ({ one }) => ({
+  project: one(project, {
+    fields: [loan.projectId, loan.chainId],
+    references: [project.projectId, project.chainId],
+  }),
+}));
+
+// Basic loan event entities for activity tracking
+export const borrowLoanEvent = onchainTable("borrow_loan_event", (t) => ({
+  ...eventParams(t),
+  ...projectId(t),
+  ...suckerGroupId(t),
+  borrowAmount: t.bigint().notNull(),
+  collateral: t.bigint().notNull(),
+  sourceFeeAmount: t.bigint().notNull(),
+  prepaidDuration: t.integer().notNull(),
+  prepaidFeePercent: t.integer().notNull(),
+  beneficiary: t.hex().notNull(),
+  token: t.hex().notNull(),
+  terminal: t.hex().notNull(),
+}));
+
+export const borrowLoanEventRelations = relations(
+  borrowLoanEvent,
+  ({ one }) => ({
+    project: one(project, {
+      fields: [borrowLoanEvent.chainId, borrowLoanEvent.projectId],
+      references: [project.chainId, project.projectId],
+    }),
+  })
+);
+
+export const repayLoanEvent = onchainTable("repay_loan_event", (t) => ({
+  ...eventParams(t),
+  ...projectId(t),
+  ...suckerGroupId(t),
+  loanId: t.bigint().notNull(),
+  paidOffLoanId: t.bigint().notNull(),
+  repayBorrowAmount: t.bigint().notNull(),
+  collateralCountToReturn: t.bigint().notNull(),
+}));
+
+export const repayLoanEventRelations = relations(repayLoanEvent, ({ one }) => ({
+  project: one(project, {
+    fields: [repayLoanEvent.chainId, repayLoanEvent.projectId],
+    references: [project.chainId, project.projectId],
+  }),
+}));
+
+export const liquidateLoanEvent = onchainTable("liquidate_loan_event", (t) => ({
+  ...eventParams(t),
+  ...projectId(t),
+  ...suckerGroupId(t),
+  borrowAmount: t.bigint().notNull(),
+  collateral: t.bigint().notNull(),
+}));
+
+export const liquidateLoanEventRelations = relations(
+  liquidateLoanEvent,
+  ({ one }) => ({
+    project: one(project, {
+      fields: [liquidateLoanEvent.chainId, liquidateLoanEvent.projectId],
+      references: [project.chainId, project.projectId],
+    }),
+  })
+);
+
+export const reallocateLoanEvent = onchainTable(
+  "reallocate_loan_event",
+  (t) => ({
+    ...eventParams(t),
+    ...projectId(t),
+    ...suckerGroupId(t),
+    loanId: t.bigint().notNull(),
+    reallocatedLoanId: t.bigint().notNull(),
+    removedCollateralCount: t.bigint().notNull(),
+  })
+);
+
+export const reallocateLoanEventRelations = relations(
+  reallocateLoanEvent,
+  ({ one }) => ({
+    project: one(project, {
+      fields: [reallocateLoanEvent.chainId, reallocateLoanEvent.projectId],
+      references: [project.chainId, project.projectId],
+    }),
   })
 );
 

@@ -1,8 +1,4 @@
-import database from "@/lib/database";
-import { getProfile } from "@/lib/profile-data";
-import { AccountHeader } from "./components/AccountHeader";
-import { AccountStats } from "./components/AccountStats";
-import { TokensTable } from "./components/TokensTable";
+import { AccountView } from "@/components/account-view";
 
 interface Props {
   params: Promise<{ address: string }>;
@@ -10,62 +6,10 @@ interface Props {
 
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
-  const addressLower = address.toLowerCase() as `0x${string}`;
-
-  const [profile, participants] = await Promise.all([
-    getProfile(address),
-    getParticipants(addressLower),
-  ]);
-
-  const displayName = profile?.name || "revnet.eth";
-  const avatarUrl = profile?.avatar;
-
-  // Calculate totals
-  const totalCashOutValue = participants.reduce(
-    (sum, p) => sum + Number(p.cashOutValue),
-    0
-  );
-  const totalRevnets = participants.length;
 
   return (
-    <main className="p-8">
-      <AccountHeader
-        address={address}
-        displayName={displayName}
-        avatarUrl={avatarUrl}
-        bio={profile?.bio}
-      />
-
-      <AccountStats
-        totalCashOutValue={totalCashOutValue}
-        totalRevnets={totalRevnets}
-      />
-
-      <TokensTable participants={participants} />
-    </main>
+    <div className="max-w-screen-xl mx-auto">
+      <AccountView address={address} />
+    </div>
   );
-}
-
-async function getParticipants(address: `0x${string}`) {
-  return database.participant.findMany({
-    where: {
-      address,
-    },
-    select: {
-      address: true,
-      cashOutValue: true,
-      balance: true,
-      projectId: true,
-      chainId: true,
-      project: {
-        select: {
-          name: true,
-          erc20Symbol: true,
-          erc20: true,
-          logoUri: true,
-          chainId: true,
-        },
-      },
-    },
-  });
 }

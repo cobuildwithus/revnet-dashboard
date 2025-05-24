@@ -96,6 +96,20 @@ export const config = {
     optimism: { startBlock: 132080269 },
     arbitrum: { startBlock: 306857614 },
   },
+  RevLoans: {
+    ethereum: {
+      startBlock: 21869096,
+    },
+    arbitrum: {
+      startBlock: 307144959,
+    },
+    base: {
+      startBlock: 26521046,
+    },
+    optimism: {
+      startBlock: 132116331,
+    },
+  },
 };
 
 export const getChainsAndRpcUrls = () => {

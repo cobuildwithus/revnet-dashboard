@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate --no-hints",
-    "prebuild": "prisma generate --no-hints"
+    "prebuild": "prisma generate --no-hints",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
@@ -24,6 +25,7 @@
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "swr": "^2.3.3",
     "tailwind-merge": "^3.3.0",
     "viem": "2.x",
     "wagmi": "^2.15.4"

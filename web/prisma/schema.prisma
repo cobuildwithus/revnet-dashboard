@@ -23,8 +23,8 @@ view Project {
   erc20Supply               BigInt  @default(0) @map("erc20_supply")
   erc20Name                 String? @map("erc20_name")
   erc20Symbol               String? @map("erc20_symbol")
-  cashoutA                  BigInt  @default(0) @map("cashout__a")
-  cashoutB                  BigInt  @default(0) @map("cashout__b")
+  cashoutA                  BigInt  @default(0) @map("cashout_a")
+  cashoutB                  BigInt  @default(0) @map("cashout_b")
   currentRulesetId          BigInt  @default(0) @map("current_ruleset_id")
   contributorsCount         Int     @default(0) @map("contributors_count")
   redeemCount               Int     @default(0) @map("redeem_count")
@@ -44,9 +44,11 @@ view Project {
   description               String?
   tags                      String[]
   projectTagline            String? @map("project_tagline")
+  suckerGroupId             String? @map("sucker_group_id")
 
   participants Participant[]
   rulesets     Ruleset[]
+  loans        Loan[]
 
   @@id([chainId, projectId])
   @@index([projectId])
@@ -120,4 +122,28 @@ view Ruleset {
   @@schema("onchain")
 }
 
+// Loan tables for borrowable amount calculations
+view Loan {
+  id                BigInt  @map("id")
+  chainId           Int     @map("chain_id")
+  projectId         Int     @map("project_id")
+  createdAt         Int     @map("created_at")
+  borrowAmount      BigInt  @map("borrow_amount")
+  collateral        BigInt  @map("collateral")
+  sourceFeeAmount   BigInt  @map("source_fee_amount")
+  prepaidDuration   Int     @map("prepaid_duration")
+  prepaidFeePercent Int     @map("prepaid_fee_percent")
+  beneficiary       String  @db.VarChar(42)
+  owner             String  @db.VarChar(42)
+  token             String  @db.VarChar(42)
+  terminal          String  @db.VarChar(42)
+  tokenUri          String? @map("token_uri")
 
+  project Project @relation(fields: [chainId, projectId], references: [chainId, projectId])
+
+  @@id([id, chainId])
+  @@index([owner])
+  @@index([projectId])
+  @@map("loan")
+  @@schema("onchain")
+}

@@ -7,6 +7,7 @@ import {
   jbRulesetsAbi,
   jbTokensAbi,
   revDeployerAbi,
+  revLoansAbi,
 } from "./abis";
 import { config, getChainsAndRpcUrls } from "./src/lib/config";
 import { erc20Abi, getAbiItem } from "viem";
@@ -53,6 +54,11 @@ export default createConfig({
       chain: config.JBRulesets,
       abi: jbRulesetsAbi,
       address: contracts.JBRulesets,
+    },
+    RevLoans: {
+      chain: config.RevLoans,
+      abi: revLoansAbi,
+      address: contracts.RevLoans,
     },
   },
   blocks: {

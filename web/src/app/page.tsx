@@ -1,23 +1,27 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { useAccount } from "wagmi";
+import { AccountView } from "@/components/account-view";
+import { GlobalStats } from "@/components/global-stats";
 
 export default function Home() {
-  const { address, isConnected } = useAccount();
+  const { address, isConnected, isConnecting, isReconnecting } = useAccount();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      {isConnected && address ? (
-        <Link href={`/account/${address}`}>
-          <Button>View my portfolio</Button>
-        </Link>
-      ) : (
-        <p className="text-muted-foreground">
-          Connect your wallet to view your portfolio
-        </p>
-      )}
+    <div className="min-h-screen flex flex-col max-w-screen-xl mx-auto">
+      <div className="flex-1">
+        <GlobalStats />
+
+        {isConnected && address && !isConnecting && !isReconnecting ? (
+          <AccountView address={address} />
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 mx-auto px-8">
+            <p className="text-muted-foreground">
+              Connect your wallet to view your portfolio
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
