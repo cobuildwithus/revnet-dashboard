@@ -12,20 +12,24 @@ export default async function AccountPage({ params }: Props) {
   const { address } = await params;
   const addressLower = address.toLowerCase() as `0x${string}`;
 
-  const [profile, participants] = await Promise.all([
+  const [profile, participantsWithBorrowableAmounts] = await Promise.all([
     getProfile(address),
-    getParticipants(addressLower),
+    getParticipantsWithBorrowableAmounts(addressLower),
   ]);
 
   const displayName = profile?.name || "revnet.eth";
   const avatarUrl = profile?.avatar;
 
   // Calculate totals
-  const totalCashOutValue = participants.reduce(
+  const totalCashOutValue = participantsWithBorrowableAmounts.reduce(
     (sum, p) => sum + Number(p.cashOutValue),
     0
   );
-  const totalRevnets = participants.length;
+  const totalBorrowableAmount = participantsWithBorrowableAmounts.reduce(
+    (sum, p) => sum + Number(p.borrowableAmount),
+    0
+  );
+  const totalRevnets = participantsWithBorrowableAmounts.length;
 
   return (
     <main className="p-8">
@@ -38,16 +42,17 @@ export default async function AccountPage({ params }: Props) {
 
       <AccountStats
         totalCashOutValue={totalCashOutValue}
+        totalBorrowableAmount={totalBorrowableAmount}
         totalRevnets={totalRevnets}
       />
 
-      <TokensTable participants={participants} />
+      <TokensTable participants={participantsWithBorrowableAmounts} />
     </main>
   );
 }
 
-async function getParticipants(address: `0x${string}`) {
-  return database.participant.findMany({
+async function getParticipantsWithBorrowableAmounts(address: `0x${string}`) {
+  const participants = await database.participant.findMany({
     where: {
       address,
     },
@@ -57,6 +62,7 @@ async function getParticipants(address: `0x${string}`) {
       balance: true,
       projectId: true,
       chainId: true,
+      borrowableAmount: true,
       project: {
         select: {
           name: true,
@@ -68,4 +74,6 @@ async function getParticipants(address: `0x${string}`) {
       },
     },
   });
+
+  return participants;
 }

@@ -2,15 +2,17 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface AccountStatsProps {
   totalCashOutValue: number;
+  totalBorrowableAmount: number;
   totalRevnets: number;
 }
 
 export function AccountStats({
   totalCashOutValue,
+  totalBorrowableAmount,
   totalRevnets,
 }: AccountStatsProps) {
   const cashOutValueEth = totalCashOutValue / 1e18;
-  const borrowableAmountEth = (totalCashOutValue * 0.5) / 1e18;
+  const borrowableAmountEth = totalBorrowableAmount / 1e18;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

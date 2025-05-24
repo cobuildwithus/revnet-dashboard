@@ -30,3 +30,18 @@ export function formatBalance(value: number): string {
   const decimalPlaces = getDecimalPlaces(actualValue);
   return actualValue.toFixed(decimalPlaces).replace(/\.?0+$/, "");
 }
+
+export function getChainName(chainId: number): string {
+  switch (chainId) {
+    case 1:
+      return "mainnet";
+    case 42161:
+      return "arbitrum";
+    case 8453:
+      return "base";
+    case 10:
+      return "optimism";
+    default:
+      return "ethereum";
+  }
+}

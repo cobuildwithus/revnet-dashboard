@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
-import { formatBalance, parseIpfsUri } from "@/lib/utils";
+import { formatBalance, getChainName, parseIpfsUri } from "@/lib/utils";
 import type { Participant, Project } from "@prisma/revnet";
 
 interface TokensTableProps {
@@ -17,22 +17,8 @@ interface TokensTableProps {
     "chainId" | "projectId" | "balance" | "cashOutValue"
   > & {
     project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
+    borrowableAmount: bigint;
   })[];
-}
-
-function getChainName(chainId: number): string {
-  switch (chainId) {
-    case 1:
-      return "mainnet";
-    case 42161:
-      return "arbitrum";
-    case 8453:
-      return "base";
-    case 10:
-      return "optimism";
-    default:
-      return "ethereum";
-  }
 }
 
 export function TokensTable({ participants }: TokensTableProps) {
@@ -54,8 +40,13 @@ export function TokensTable({ participants }: TokensTableProps) {
           </TableHeader>
           <TableBody>
             {participants.map((participant) => {
-              const cashOutValueEth = Number(participant.cashOutValue) / 1e18;
-              const borrowableAmount = cashOutValueEth * 0.5;
+              const cashOutValueEth = formatBalance(
+                Number(participant.cashOutValue)
+              );
+              // Use calculated borrowable amount if available, otherwise fallback to 50% of cashout
+              const borrowableAmountEth = formatBalance(
+                Number(participant.borrowableAmount)
+              );
               const chainName = getChainName(participant.chainId);
               const logoUrl = parseIpfsUri(participant.project.logoUri);
 
@@ -113,10 +104,10 @@ export function TokensTable({ participants }: TokensTableProps) {
                     </div>
                   </TableCell>
                   <TableCell className="font-medium">
-                    Ξ {cashOutValueEth.toFixed(4)}
+                    Ξ {cashOutValueEth}
                   </TableCell>
                   <TableCell className="font-medium">
-                    Ξ {borrowableAmount.toFixed(4)}
+                    Ξ {borrowableAmountEth}
                   </TableCell>
                 </TableRow>
               );

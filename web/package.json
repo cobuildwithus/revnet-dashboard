@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate --no-hints",
-    "prebuild": "prisma generate --no-hints"
+    "prebuild": "prisma generate --no-hints",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2",
