@@ -15,8 +15,9 @@ import { useMemo } from "react";
 
 interface RevnetTableRowProps {
   suckerGroupId: string;
-  participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
+  participants: (Pick<Participant, "chainId" | "projectId"> & {
     balance: number;
+    cashOutValue: number;
     project: Pick<Project, "name" | "erc20Symbol" | "logoUri" | "chainId">;
   })[];
   totalBalance: number;

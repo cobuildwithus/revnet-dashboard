@@ -14,12 +14,13 @@ import {
 } from "@/lib/utils";
 
 interface RevnetsTableProps {
-  participants: (Pick<Participant, "chainId" | "projectId" | "cashOutValue"> & {
+  participants: (Pick<Participant, "chainId" | "projectId"> & {
     project: Pick<
       Project,
       "name" | "erc20Symbol" | "logoUri" | "chainId" | "suckerGroupId"
     >;
     balance: number;
+    cashOutValue: number;
   })[];
 }
 
