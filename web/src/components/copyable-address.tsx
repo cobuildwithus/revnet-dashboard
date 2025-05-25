@@ -1,5 +1,6 @@
 "use client";
 
+import { getShortAddress } from "@/lib/utils";
 import { useState } from "react";
 
 interface CopyableAddressProps {
@@ -12,11 +13,6 @@ export function CopyableAddress({
   className = "",
 }: CopyableAddressProps) {
   const [copied, setCopied] = useState(false);
-
-  const shortenAddress = (addr: string): string => {
-    if (addr.length < 10) return addr;
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   const handleCopy = async () => {
     try {
@@ -35,7 +31,7 @@ export function CopyableAddress({
       className={`cursor-pointer hover:text-primary transition-colors ${className}`}
       title={copied ? "Copied!" : "Click to copy address"}
     >
-      {copied ? "Copied!" : shortenAddress(address)}
+      {copied ? "Copied!" : getShortAddress(address)}
     </button>
   );
 }

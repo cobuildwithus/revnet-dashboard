@@ -5,6 +5,7 @@ import { getProfile } from "@/lib/profile-data";
 import { getBorrowableAmount } from "@/lib/hooks/rev-loans/get-borrowable-amount";
 import { unstable_cache } from "next/cache";
 import { resolveEnsToAddress } from "../ens";
+import { getShortAddress } from "../utils";
 
 export async function getAccountData(addressOrEns: string) {
   let address: string;
@@ -45,7 +46,7 @@ export async function getAccountData(addressOrEns: string) {
 
   return {
     profile: {
-      name: profile?.name || "revnet.eth",
+      name: profile?.name || getShortAddress(address),
       avatar: profile?.avatar,
       bio: profile?.bio,
       address,

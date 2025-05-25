@@ -1,16 +1,13 @@
 import { getProfile } from "@/lib/profile-data";
 import type { Metadata } from "next";
-
-export function formatAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}
+import { getShortAddress } from "@/lib/utils";
 
 export async function generateAccountMetadata(
   address: string
 ): Promise<Metadata> {
   try {
     const profile = await getProfile(address);
-    const name = profile?.name || formatAddress(address);
+    const name = profile?.name || getShortAddress(address);
     const bio = profile?.bio;
     const avatar = profile?.avatar;
 
@@ -39,7 +36,7 @@ export async function generateAccountMetadata(
   } catch (error) {
     console.error("Error generating metadata:", error);
     return {
-      title: `${formatAddress(
+      title: `${getShortAddress(
         address
       )} - Revnet Portfolio | Autonomous Revenue Dashboard`,
       description: `Explore tokenized revenue streams and autonomous value creation for ${address} in the Revnet ecosystem`,

@@ -17,10 +17,7 @@ export function AccountHeader({
   return (
     <div className="flex items-center space-x-4 mb-8">
       <Avatar className={bio ? "size-20" : "size-16"}>
-        <AvatarImage
-          src={avatarUrl || "https://placehold.co/64"}
-          alt="Avatar"
-        />
+        {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar" />}
         <AvatarFallback className={bio ? "text-xl" : "text-lg"}>
           {displayName.slice(0, 2).toUpperCase()}
         </AvatarFallback>
