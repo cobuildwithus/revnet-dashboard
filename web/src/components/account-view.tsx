@@ -6,14 +6,26 @@ import { AccountStats } from "@/app/account/[address]/components/account-stats";
 import { RevnetsTable } from "@/app/account/[address]/components/revnets-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
+type AccountData = Awaited<
+  ReturnType<typeof import("@/lib/queries/account-data").getAccountData>
+>;
+
 interface AccountViewProps {
   address: string;
+  data?: AccountData;
 }
 
-export function AccountView({ address }: AccountViewProps) {
-  const { accountData, isLoading, error } = useAccountData(address);
+export function AccountView({ address, data }: AccountViewProps) {
+  const { accountData, isLoading, error } = useAccountData(
+    data ? undefined : address
+  );
 
-  if (isLoading) {
+  // Use provided data or hook data
+  const finalData = data || accountData;
+  const finalIsLoading = data ? false : isLoading;
+  const finalError = data ? null : error;
+
+  if (finalIsLoading) {
     return (
       <main className="py-12 px-4 md:px-8 mx-auto">
         <div className="space-y-8">
@@ -32,19 +44,19 @@ export function AccountView({ address }: AccountViewProps) {
     );
   }
 
-  if (error) {
+  if (finalError) {
     return (
       <main className="py-12 px-4 md:px-8 mx-auto">
         <div className="text-center">
           <p className="text-red-500">
-            Error loading account data. {error.message}
+            Error loading account data. {finalError.message}
           </p>
         </div>
       </main>
     );
   }
 
-  if (!accountData) {
+  if (!finalData) {
     return null;
   }
 
@@ -52,18 +64,18 @@ export function AccountView({ address }: AccountViewProps) {
     <main className="py-12 px-4 md:px-8 mx-auto">
       <AccountHeader
         address={address}
-        displayName={accountData.profile.name}
-        avatarUrl={accountData.profile.avatar}
-        bio={accountData.profile.bio}
+        displayName={finalData.profile.name}
+        avatarUrl={finalData.profile.avatar}
+        bio={finalData.profile.bio}
       />
 
       <AccountStats
-        totalCashOutValue={accountData.stats.totalCashOutValue}
-        totalRevnets={accountData.stats.totalRevnets}
-        totalBorrowableAmount={accountData.stats.totalBorrowableAmount}
+        totalCashOutValue={finalData.stats.totalCashOutValue}
+        totalRevnets={finalData.stats.totalRevnets}
+        totalBorrowableAmount={finalData.stats.totalBorrowableAmount}
       />
 
-      <RevnetsTable participants={accountData.participants} />
+      <RevnetsTable participants={finalData.participants} />
     </main>
   );
 }

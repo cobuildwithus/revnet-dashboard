@@ -43,8 +43,10 @@ export async function getAccountData(address: string) {
   };
 }
 
-async function getParticipants(address: `0x${string}`) {
-  const participants = await database.participant.findMany({
+import { unstable_cache } from "next/cache";
+
+const getParticipantsFromDbUncached = async (address: `0x${string}`) => {
+  return await database.participant.findMany({
     where: {
       address,
       isRevnet: true,
@@ -67,6 +69,19 @@ async function getParticipants(address: `0x${string}`) {
       },
     },
   });
+};
+
+const getParticipantsFromDb = unstable_cache(
+  getParticipantsFromDbUncached,
+  ["participants-db"],
+  {
+    revalidate: 60, // Cache for 1 minute
+    tags: ["participants"],
+  }
+);
+
+async function getParticipants(address: `0x${string}`) {
+  const participants = await getParticipantsFromDb(address);
 
   // Get borrowable amounts for all participants
   const participantsWithBorrowableAmount = await Promise.all(

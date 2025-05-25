@@ -1,5 +1,6 @@
 import { AccountView } from "@/components/account-view";
 import { generateAccountMetadata } from "./metadata";
+import { getAccountData } from "@/lib/queries/account-data";
 import type { Metadata } from "next";
 
 interface Props {
@@ -14,9 +15,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function AccountPage({ params }: Props) {
   const { address } = await params;
 
+  const accountData = await getAccountData(address);
+
   return (
     <div className="max-w-screen-xl mx-auto">
-      <AccountView address={address} />
+      <AccountView address={address} data={accountData} />
     </div>
   );
 }
