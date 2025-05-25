@@ -3,8 +3,23 @@
 import database from "@/lib/database";
 import { getProfile } from "@/lib/profile-data";
 import { getBorrowableAmount } from "@/lib/hooks/rev-loans/get-borrowable-amount";
+import { unstable_cache } from "next/cache";
+import { resolveEnsToAddress } from "../ens";
 
-export async function getAccountData(address: string) {
+export async function getAccountData(addressOrEns: string) {
+  let address: string;
+
+  // Check if it's an ENS name (contains .eth or other TLD)
+  if (addressOrEns.includes(".")) {
+    const resolvedAddress = await resolveEnsToAddress(addressOrEns);
+    if (!resolvedAddress) {
+      throw new Error(`Failed to resolve ENS name: ${addressOrEns}`);
+    }
+    address = resolvedAddress;
+  } else {
+    address = addressOrEns;
+  }
+
   const addressLower = address.toLowerCase() as `0x${string}`;
 
   const [profile, participants] = await Promise.all([
@@ -33,6 +48,7 @@ export async function getAccountData(address: string) {
       name: profile?.name || "revnet.eth",
       avatar: profile?.avatar,
       bio: profile?.bio,
+      address,
     },
     participants,
     stats: {
@@ -43,10 +59,8 @@ export async function getAccountData(address: string) {
   };
 }
 
-import { unstable_cache } from "next/cache";
-
 const getParticipantsFromDbUncached = async (address: `0x${string}`) => {
-  return await database.participant.findMany({
+  const participants = await database.participant.findMany({
     where: {
       address,
       isRevnet: true,
@@ -69,6 +83,12 @@ const getParticipantsFromDbUncached = async (address: `0x${string}`) => {
       },
     },
   });
+
+  return participants.map((participant) => ({
+    ...participant,
+    balance: Number(participant.balance),
+    cashOutValue: Number(participant.cashOutValue),
+  }));
 };
 
 const getParticipantsFromDb = unstable_cache(

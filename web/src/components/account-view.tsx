@@ -1,9 +1,9 @@
 "use client";
 
 import { useAccountData } from "@/lib/hooks/use-account-data";
-import { AccountHeader } from "@/app/account/[address]/components/account-header";
-import { AccountStats } from "@/app/account/[address]/components/account-stats";
-import { RevnetsTable } from "@/app/account/[address]/components/revnets-table";
+import { AccountHeader } from "@/app/account/[addressOrEns]/components/account-header";
+import { AccountStats } from "@/app/account/[addressOrEns]/components/account-stats";
+import { RevnetsTable } from "@/app/account/[addressOrEns]/components/revnets-table";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type AccountData = Awaited<

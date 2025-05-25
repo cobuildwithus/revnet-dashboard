@@ -10,34 +10,72 @@ const safeConnector = safe({
 
 export const transports = {
   [mainnet.id]: fallback([
-    http(
-      `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-    ),
-    http(`https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`),
+    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
+      ? [
+          http(
+            `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          ),
+        ]
+      : []),
+    ...(process.env.NEXT_PUBLIC_INFURA_ID
+      ? [
+          http(
+            `https://mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
+          ),
+        ]
+      : []),
+    http(), // Public RPC fallback
   ]),
   [optimism.id]: fallback([
-    http(
-      `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-    ),
-    http(
-      `https://optimism-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
-    ),
+    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
+      ? [
+          http(
+            `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          ),
+        ]
+      : []),
+    ...(process.env.NEXT_PUBLIC_INFURA_ID
+      ? [
+          http(
+            `https://optimism-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
+          ),
+        ]
+      : []),
+    http(), // Public RPC fallback
   ]),
   [base.id]: fallback([
-    http(
-      `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-    ),
-    http(
-      `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
-    ),
+    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
+      ? [
+          http(
+            `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          ),
+        ]
+      : []),
+    ...(process.env.NEXT_PUBLIC_INFURA_ID
+      ? [
+          http(
+            `https://base-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
+          ),
+        ]
+      : []),
+    http(), // Public RPC fallback
   ]),
   [arbitrum.id]: fallback([
-    http(
-      `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-    ),
-    http(
-      `https://arbitrum-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
-    ),
+    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
+      ? [
+          http(
+            `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
+          ),
+        ]
+      : []),
+    ...(process.env.NEXT_PUBLIC_INFURA_ID
+      ? [
+          http(
+            `https://arbitrum-mainnet.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`
+          ),
+        ]
+      : []),
+    http(), // Public RPC fallback
   ]),
 };
 
@@ -50,7 +88,7 @@ export const wagmiConfig = createConfig({
       appLogoUrl: "https://app.revnet.eth.sucks/assets/img/small-bw.svg",
     }),
     walletConnect({
-      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+      projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "",
       showQrModal: false,
       metadata: {
         name: "REVNET",
