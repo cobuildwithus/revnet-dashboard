@@ -32,8 +32,8 @@ export function groupParticipantsBySuckerGroup<
 export function calculateConditionalNetWorth(
   userBalance: number,
   totalSupply: number,
-  cashoutA: number | bigint,
-  cashoutB: number | bigint,
+  cashoutA: string,
+  cashoutB: string,
   projectBalance: number
 ): number {
   // Constants for fixed-point maths (use string to avoid BigInt literal syntax)
@@ -126,8 +126,8 @@ export function aggregateGroupData<
     const conditionalNetWorth = calculateConditionalNetWorth(
       projectTotalBalance,
       Number(project.erc20Supply),
-      project.cashoutA as unknown as bigint | number,
-      project.cashoutB as unknown as bigint | number,
+      project.cashoutA.toString(),
+      project.cashoutB.toString(),
       projectBalance
     );
 

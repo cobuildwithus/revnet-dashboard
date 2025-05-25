@@ -93,6 +93,14 @@ const getParticipantsFromDbUncached = async (address: `0x${string}`) => {
     ...participant,
     balance: Number(participant.balance),
     cashOutValue: Number(participant.cashOutValue),
+    project: {
+      ...participant.project,
+      // Ensure any Decimal/BigInt fields are safely serializable
+      erc20Supply: Number(participant.project.erc20Supply),
+      cashoutA: Number(participant.project.cashoutA),
+      cashoutB: Number(participant.project.cashoutB),
+      balance: Number(participant.project.balance),
+    },
   }));
 };
 

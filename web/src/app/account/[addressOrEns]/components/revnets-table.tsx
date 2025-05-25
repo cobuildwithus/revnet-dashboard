@@ -17,16 +17,13 @@ interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId"> & {
     project: Pick<
       Project,
-      | "name"
-      | "erc20Symbol"
-      | "logoUri"
-      | "chainId"
-      | "suckerGroupId"
-      | "erc20Supply"
-      | "cashoutA"
-      | "cashoutB"
-      | "balance"
-    >;
+      "name" | "erc20Symbol" | "logoUri" | "chainId" | "suckerGroupId"
+    > & {
+      balance: number;
+      erc20Supply: number;
+      cashoutA: number;
+      cashoutB: number;
+    };
     balance: number;
     cashOutValue: number;
   })[];
