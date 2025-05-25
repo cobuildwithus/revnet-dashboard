@@ -12,6 +12,8 @@ import {
   groupParticipantsBySuckerGroup,
   aggregateGroupData,
 } from "@/lib/revnet";
+import { TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId"> & {
@@ -55,7 +57,15 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
               <TableHead>Revnet</TableHead>
               <TableHead>Balance</TableHead>
               <TableHead>Net worth</TableHead>
-              <TableHead>Net worth (conditional)</TableHead>
+              <TableHead>
+                <Tooltip>
+                  <TooltipTrigger>Net worth (conditional)</TooltipTrigger>
+                  <TooltipContent>
+                    What tokens would be worth if all other holders cash out
+                    first
+                  </TooltipContent>
+                </Tooltip>
+              </TableHead>
               <TableHead>Borrowable</TableHead>
             </TableRow>
           </TableHeader>

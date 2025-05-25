@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/footer";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({ variable: "--font-sans", subsets: ["latin"] });
 
@@ -25,11 +26,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <WagmiProvider>
-            <Header />
-            {children}
-            <Footer />
-          </WagmiProvider>
+          <TooltipProvider delayDuration={350}>
+            <WagmiProvider>
+              <Header />
+              {children}
+              <Footer />
+            </WagmiProvider>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -8,6 +8,9 @@ import type { Participant, Project } from "@prisma/client";
 import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
+import { TooltipContent } from "@/components/ui/tooltip";
+import { TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip } from "@/components/ui/tooltip";
 
 interface RevnetTableRowProps {
   suckerGroupId: string;
@@ -119,7 +122,14 @@ export function RevnetTableRow({
         </div>
       </TableCell>
       <TableCell className="font-medium">Ξ {cashOutValueEth}</TableCell>
-      <TableCell className="font-medium">Ξ {conditionalNetWorthEth}</TableCell>
+      <TableCell className="font-medium">
+        <Tooltip>
+          <TooltipTrigger>Ξ {conditionalNetWorthEth}</TooltipTrigger>
+          <TooltipContent>
+            What tokens would be worth if all other holders cash out first
+          </TooltipContent>
+        </Tooltip>
+      </TableCell>
       <TableCell className="font-medium">
         <div className="w-20 h-5 flex items-center">
           {isLoading ? (
