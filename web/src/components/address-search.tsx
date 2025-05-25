@@ -70,8 +70,8 @@ export function AddressSearch() {
   return (
     <div
       className={cn("relative transition-all duration-200", {
-        "w-64 sm:w-80": isFocused,
-        "w-24 sm:w-40": !isFocused,
+        "w-64 sm:w-96": isFocused,
+        "w-24 sm:w-64": !isFocused,
       })}
     >
       <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
