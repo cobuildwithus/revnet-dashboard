@@ -1,6 +1,6 @@
 "use client";
 
-import { getShortAddress } from "@/lib/utils";
+import { getShortAddress } from "@/lib/formatting";
 import { useState } from "react";
 
 interface CopyableAddressProps {

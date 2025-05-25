@@ -5,7 +5,7 @@ import { getProfile } from "@/lib/profile-data";
 import { getBorrowableAmount } from "@/lib/hooks/rev-loans/get-borrowable-amount";
 import { unstable_cache } from "next/cache";
 import { resolveEnsToAddress } from "../ens";
-import { getShortAddress } from "../utils";
+import { getShortAddress } from "../formatting";
 
 export async function getAccountData(addressOrEns: string) {
   let address: string;
@@ -80,6 +80,10 @@ const getParticipantsFromDbUncached = async (address: `0x${string}`) => {
           logoUri: true,
           chainId: true,
           suckerGroupId: true,
+          erc20Supply: true,
+          cashoutA: true,
+          cashoutB: true,
+          balance: true,
         },
       },
     },

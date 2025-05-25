@@ -11,13 +11,21 @@ import { RevnetTableRow } from "./revnet-table-row";
 import {
   groupParticipantsBySuckerGroup,
   aggregateGroupData,
-} from "@/lib/utils";
+} from "@/lib/revnet";
 
 interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId"> & {
     project: Pick<
       Project,
-      "name" | "erc20Symbol" | "logoUri" | "chainId" | "suckerGroupId"
+      | "name"
+      | "erc20Symbol"
+      | "logoUri"
+      | "chainId"
+      | "suckerGroupId"
+      | "erc20Supply"
+      | "cashoutA"
+      | "cashoutB"
+      | "balance"
     >;
     balance: number;
     cashOutValue: number;
@@ -50,6 +58,7 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
               <TableHead>Revnet</TableHead>
               <TableHead>Balance</TableHead>
               <TableHead>Net worth</TableHead>
+              <TableHead>Net worth (conditional)</TableHead>
               <TableHead>Borrowable</TableHead>
             </TableRow>
           </TableHeader>
@@ -61,6 +70,7 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
                 participants={group.participants}
                 totalBalance={group.totalBalance}
                 totalCashOutValue={group.totalCashOutValue}
+                totalConditionalNetWorth={group.totalConditionalNetWorth}
                 uniqueChains={group.uniqueChains}
               />
             ))}

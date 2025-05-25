@@ -1,6 +1,6 @@
 import { getProfile } from "@/lib/profile-data";
 import type { Metadata } from "next";
-import { getShortAddress } from "@/lib/utils";
+import { getShortAddress } from "@/lib/formatting";
 
 export async function generateAccountMetadata(
   address: string

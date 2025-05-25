@@ -2,12 +2,8 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import Image from "next/image";
-import {
-  formatBalance,
-  getChainName,
-  getRevnetUrl,
-  parseIpfsUri,
-} from "@/lib/utils";
+import { formatBalance, getChainName, getRevnetUrl } from "@/lib/formatting";
+import { parseIpfsUri } from "@/lib/utils";
 import type { Participant, Project } from "@prisma/client";
 import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -22,6 +18,7 @@ interface RevnetTableRowProps {
   })[];
   totalBalance: number;
   totalCashOutValue: number;
+  totalConditionalNetWorth: number;
   uniqueChains: number[];
 }
 
@@ -30,6 +27,7 @@ export function RevnetTableRow({
   participants,
   totalBalance,
   totalCashOutValue,
+  totalConditionalNetWorth,
   uniqueChains,
 }: RevnetTableRowProps) {
   // Use first project - they're all the same in a sucker group
@@ -50,6 +48,7 @@ export function RevnetTableRow({
     useMultipleBorrowableAmounts(borrowableParams);
 
   const cashOutValueEth = formatBalance(totalCashOutValue);
+  const conditionalNetWorthEth = formatBalance(totalConditionalNetWorth);
   const borrowableAmountEth = formatBalance(totalBorrowableAmount);
   const logoUrl = parseIpfsUri(project.logoUri);
 
@@ -120,6 +119,7 @@ export function RevnetTableRow({
         </div>
       </TableCell>
       <TableCell className="font-medium">Ξ {cashOutValueEth}</TableCell>
+      <TableCell className="font-medium">Ξ {conditionalNetWorthEth}</TableCell>
       <TableCell className="font-medium">
         <div className="w-20 h-5 flex items-center">
           {isLoading ? (

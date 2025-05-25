@@ -19,7 +19,7 @@ view Project {
   deployer                  String  @db.VarChar(42)
   owner                     String  @db.VarChar(42)
   erc20                     String? @db.VarChar(42)
-  erc20Supply               BigInt  @default(0) @map("erc20_supply")
+  erc20Supply               Decimal  @default(0) @map("erc20_supply")
   erc20Name                 String? @map("erc20_name")
   erc20Symbol               String? @map("erc20_symbol")
   cashoutA                  BigInt  @default(0) @map("cashout_a")
