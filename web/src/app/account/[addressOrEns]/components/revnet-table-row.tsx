@@ -8,9 +8,6 @@ import type { Participant, Project } from "@prisma/client";
 import { useMultipleBorrowableAmounts } from "@/lib/hooks/rev-loans/use-multiple-borrowable-amounts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
-import { TooltipContent } from "@/components/ui/tooltip";
-import { TooltipTrigger } from "@/components/ui/tooltip";
-import { Tooltip } from "@/components/ui/tooltip";
 
 interface RevnetTableRowProps {
   suckerGroupId: string;
@@ -51,7 +48,7 @@ export function RevnetTableRow({
     useMultipleBorrowableAmounts(borrowableParams);
 
   const cashOutValueEth = formatBalance(totalCashOutValue);
-  const conditionalNetWorthEth = formatBalance(totalConditionalNetWorth);
+  // const conditionalNetWorthEth = formatBalance(totalConditionalNetWorth);
   const borrowableAmountEth = formatBalance(totalBorrowableAmount);
   const logoUrl = parseIpfsUri(project.logoUri);
 

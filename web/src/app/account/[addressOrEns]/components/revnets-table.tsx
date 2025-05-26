@@ -12,8 +12,6 @@ import {
   groupParticipantsBySuckerGroup,
   aggregateGroupData,
 } from "@/lib/revnet";
-import { TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Tooltip } from "@/components/ui/tooltip";
 
 interface RevnetsTableProps {
   participants: (Pick<Participant, "chainId" | "projectId"> & {
