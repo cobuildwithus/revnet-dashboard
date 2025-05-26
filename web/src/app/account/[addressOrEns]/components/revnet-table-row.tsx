@@ -27,7 +27,6 @@ export function RevnetTableRow({
   participants,
   totalBalance,
   totalCashOutValue,
-  totalConditionalNetWorth,
   uniqueChains,
 }: RevnetTableRowProps) {
   // Use first project - they're all the same in a sucker group
