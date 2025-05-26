@@ -57,7 +57,7 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
               <TableHead>Revnet</TableHead>
               <TableHead>Balance</TableHead>
               <TableHead>Net worth</TableHead>
-              <TableHead>
+              {/* <TableHead>
                 <Tooltip>
                   <TooltipTrigger>Net worth (conditional)</TooltipTrigger>
                   <TooltipContent>
@@ -65,7 +65,7 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
                     first
                   </TooltipContent>
                 </Tooltip>
-              </TableHead>
+              </TableHead> */}
               <TableHead>Borrowable</TableHead>
             </TableRow>
           </TableHeader>
