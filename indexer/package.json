@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "ponder dev",
+    "dev": "ponder dev --port 42071",
     "start": "ponder start",
     "db": "ponder db",
     "codegen": "ponder codegen",

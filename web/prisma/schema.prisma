@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas = ["onchain"]
+  schemas = ["juicebox"]
 }
 
 view Project {
@@ -52,7 +52,7 @@ view Project {
   @@id([chainId, projectId])
   @@index([projectId])
   @@map("project")
-  @@schema("onchain")
+  @@schema("juicebox")
 }
 
 view SuckerGroup {
@@ -62,7 +62,7 @@ view SuckerGroup {
   createdAt Int      @map("created_at")
 
   @@map("sucker_group")
-  @@schema("onchain")
+  @@schema("juicebox")
 }
 
 view Participant {
@@ -81,7 +81,7 @@ view Participant {
   @@index([address])
   @@index([chainId, projectId])
   @@map("participant")
-  @@schema("onchain")
+  @@schema("juicebox")
 }
 
 view Ruleset {
@@ -128,7 +128,7 @@ view Ruleset {
   @@index([rulesetId])
   @@index([start])
   @@map("ruleset")
-  @@schema("onchain")
+  @@schema("juicebox")
 }
 
 // Loan tables for borrowable amount calculations
@@ -154,5 +154,5 @@ view Loan {
   @@index([owner])
   @@index([projectId])
   @@map("loan")
-  @@schema("onchain")
+  @@schema("juicebox")
 }
