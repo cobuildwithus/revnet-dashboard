@@ -10,13 +10,6 @@ const safeConnector = safe({
 
 export const transports = {
   [mainnet.id]: fallback([
-    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
-      ? [
-          http(
-            `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-          ),
-        ]
-      : []),
     ...(process.env.NEXT_PUBLIC_INFURA_ID
       ? [
           http(
@@ -27,13 +20,6 @@ export const transports = {
     http(), // Public RPC fallback
   ]),
   [optimism.id]: fallback([
-    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
-      ? [
-          http(
-            `https://opt-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-          ),
-        ]
-      : []),
     ...(process.env.NEXT_PUBLIC_INFURA_ID
       ? [
           http(
@@ -44,13 +30,6 @@ export const transports = {
     http(), // Public RPC fallback
   ]),
   [base.id]: fallback([
-    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
-      ? [
-          http(
-            `https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-          ),
-        ]
-      : []),
     ...(process.env.NEXT_PUBLIC_INFURA_ID
       ? [
           http(
@@ -61,13 +40,6 @@ export const transports = {
     http(), // Public RPC fallback
   ]),
   [arbitrum.id]: fallback([
-    ...(process.env.NEXT_PUBLIC_ALCHEMY_ID
-      ? [
-          http(
-            `https://arb-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`
-          ),
-        ]
-      : []),
     ...(process.env.NEXT_PUBLIC_INFURA_ID
       ? [
           http(
