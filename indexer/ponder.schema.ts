@@ -153,6 +153,20 @@ export const participant = onchainTable(
   })
 );
 
+export const payEvent = onchainTable("pay_event", (t) => ({
+  ...eventParams(t),
+  ...projectId(t),
+  rulesetId: t.bigint().notNull(),
+  rulesetCycleNumber: t.bigint().notNull(),
+  payer: t.hex().notNull(),
+  beneficiary: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  newlyIssuedTokenCount: t.bigint().notNull(),
+  memo: t.text().notNull(),
+  metadata: t.hex().notNull(),
+  caller: t.hex().notNull(),
+}));
+
 // Basic loan entity for tracking borrowable amounts
 export const loan = onchainTable(
   "loan",
