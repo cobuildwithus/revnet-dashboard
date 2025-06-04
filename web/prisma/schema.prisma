@@ -22,13 +22,13 @@ view Project {
   erc20Supply               Decimal  @default(0) @map("erc20_supply")
   erc20Name                 String? @map("erc20_name")
   erc20Symbol               String? @map("erc20_symbol")
-  cashoutA                  BigInt  @default(0) @map("cashout_a")
-  cashoutB                  BigInt  @default(0) @map("cashout_b")
+  cashoutA                  Decimal  @default(0) @map("cashout_a")
+  cashoutB                  Decimal  @default(0) @map("cashout_b")
   currentRulesetId          BigInt  @default(0) @map("current_ruleset_id")
   contributorsCount         Int     @default(0) @map("contributors_count")
   redeemCount               Int     @default(0) @map("redeem_count")
-  redeemVolume              BigInt  @default(0) @map("redeem_volume")
-  pendingReservedTokens     BigInt  @default(0) @map("pending_reserved_tokens")
+  redeemVolume              Decimal  @default(0) @map("redeem_volume")
+  pendingReservedTokens     Decimal  @default(0) @map("pending_reserved_tokens")
   metadataUri               String? @map("metadata_uri")
   metadata                  Json?
   name                      String?
@@ -73,7 +73,7 @@ view Participant {
   isRevnet     Boolean? @map("is_revnet")
   address      String  @db.VarChar(42)
   firstOwned   Int?    @map("first_owned")
-  cashOutValue BigInt  @default(0) @map("cash_out_value")
+  cashOutValue Decimal  @default(0) @map("cash_out_value")
 
   project Project @relation(fields: [chainId, projectId], references: [chainId, projectId])
 
