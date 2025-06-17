@@ -1,0 +1,36 @@
+import { type Context, type Event, ponder } from "ponder:registry";
+import { project } from "ponder:schema";
+import { fetchProjectMetadata } from "../../lib/project-metadata";
+
+ponder.on("JBController:LaunchProject", launchProject);
+
+async function launchProject(params: {
+  event: Event<"JBController:LaunchProject">;
+  context: Context<"JBController:LaunchProject">;
+}) {
+  const { event, context } = params;
+  const { args } = event;
+  const { projectId: _projectId, caller, projectUri } = args;
+  const projectId = Number(_projectId);
+  const chainId = context.chain.id;
+
+  const metadata = await fetchProjectMetadata(projectUri);
+
+  await context.db.update(project, { chainId, projectId }).set({
+    deployer: caller,
+    metadataUri: projectUri,
+    metadata,
+    name: metadata?.name,
+    infoUri: metadata?.infoUri,
+    logoUri: metadata?.logoUri,
+    coverImageUri: metadata?.coverImageUri,
+    twitter: metadata?.twitter,
+    discord: metadata?.discord,
+    telegram: metadata?.telegram,
+    tokens: metadata?.tokens,
+    domain: metadata?.domain,
+    description: metadata?.description,
+    tags: metadata?.tags,
+    projectTagline: metadata?.projectTagline,
+  });
+}
