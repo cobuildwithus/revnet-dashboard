@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { client, graphql } from "ponder";
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { getProject } from "./lib/project";
+import { getProjects } from "./lib/project";
 
 const app = new Hono();
 
@@ -13,9 +13,12 @@ app.use("/graphql", graphql({ db, schema }));
 
 app.get("/project/:chainId/:id", async (c) => {
   try {
-    const project = await getProject(Number(c.req.param("chainId")), Number(c.req.param("id")));
-    if (!project) return c.json({ error: "Project not found" }, 404);
-    return c.json(project);
+    const projects = await getProjects(
+      Number(c.req.param("chainId")),
+      Number(c.req.param("id"))
+    );
+    if (!projects) return c.json({ error: "Projects not found" }, 404);
+    return c.json(projects);
   } catch (error) {
     return c.json({ error: "Internal server error" }, 500);
   }
