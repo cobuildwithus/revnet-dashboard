@@ -4,16 +4,9 @@ import { getRevnetTokenPrice } from "./token-price";
 export async function getProjects(chainId: number, projectId: number) {
   const project = await db.query.project.findFirst({
     columns: {
-      chainId: true,
-      projectId: true,
-      name: true,
-      projectTagline: true,
-      erc20: true,
-      erc20Name: true,
-      erc20Symbol: true,
-      logoUri: true,
-      metadata: true,
       suckerGroupId: true,
+      projectId: true,
+      chainId: true,
     },
     where: (project, { eq, and }) =>
       and(eq(project.projectId, projectId), eq(project.chainId, chainId)),
@@ -37,6 +30,7 @@ export async function getProjects(chainId: number, projectId: number) {
           logoUri: true,
           metadata: true,
           suckerGroupId: true,
+          isRevnet: true,
         },
         where: (project, { eq }) => eq(project.suckerGroupId, suckerGroupId),
       })
@@ -63,6 +57,7 @@ export async function getProjects(chainId: number, projectId: number) {
           disclosure: proj.metadata?.payDisclosure || "",
         },
         suckerGroupId: proj.suckerGroupId,
+        isRevnet: proj.isRevnet,
       };
     })
   );
