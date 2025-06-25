@@ -21,23 +21,26 @@ export async function getProjects(chainId: number, projectId: number) {
 
   if (!project) return null;
 
+  const suckerGroupId = project.suckerGroupId;
+
   // Get all projects with the same suckerGroupId
-  const allProjects = await db.query.project.findMany({
-    columns: {
-      chainId: true,
-      projectId: true,
-      name: true,
-      projectTagline: true,
-      erc20: true,
-      erc20Name: true,
-      erc20Symbol: true,
-      logoUri: true,
-      metadata: true,
-      suckerGroupId: true,
-    },
-    where: (project, { eq }) =>
-      eq(project.suckerGroupId, project.suckerGroupId),
-  });
+  const allProjects = suckerGroupId
+    ? await db.query.project.findMany({
+        columns: {
+          chainId: true,
+          projectId: true,
+          name: true,
+          projectTagline: true,
+          erc20: true,
+          erc20Name: true,
+          erc20Symbol: true,
+          logoUri: true,
+          metadata: true,
+          suckerGroupId: true,
+        },
+        where: (project, { eq }) => eq(project.suckerGroupId, suckerGroupId),
+      })
+    : [];
 
   // Build the response array with token prices
   const projectsWithPrices = await Promise.all(
