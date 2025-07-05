@@ -20,7 +20,7 @@ export async function generateAccountMetadata(
         title: `${name} - Revnet Portfolio`,
         description:
           bio ||
-          `Discover ${name}'s portfolio of revnet tokens. Track real-time cash-out values and borrowing power across multiple chains.`,
+          `Discover ${name}'s portfolio of revnets. Track real-time cash-out values and borrowing power across multiple chains.`,
         images: avatar ? [{ url: avatar, alt: `${name}'s avatar` }] : [],
         type: "profile",
       },
