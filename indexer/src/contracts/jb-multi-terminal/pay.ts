@@ -32,7 +32,7 @@ async function pay(params: {
     chainId,
   });
 
-  await context.db
+  const updatedProject = await context.db
     .update(project, {
       projectId,
       chainId,
@@ -42,6 +42,10 @@ async function pay(params: {
       paymentsCount: p.paymentsCount + 1,
       contributorsCount: p.contributorsCount + (payerParticipant ? 0 : 1),
     }));
+
+  if (!updatedProject.suckerGroupId) {
+    throw new Error("Project has no sucker group id");
+  }
 
   await context.db.insert(payEvent).values({
     chainId,
@@ -59,6 +63,7 @@ async function pay(params: {
     newlyIssuedTokenCount,
     memo,
     metadata,
+    suckerGroupId: updatedProject.suckerGroupId,
   });
 
   await refreshProjectCashoutCoefficients({
