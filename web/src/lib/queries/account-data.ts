@@ -122,7 +122,9 @@ async function getParticipants(address: `0x${string}`) {
       const borrowableAmount = await getBorrowableAmount(
         participant.chainId,
         participant.projectId,
-        Number(participant.balance)
+        Number(participant.balance),
+        18,
+        1
       );
 
       return {

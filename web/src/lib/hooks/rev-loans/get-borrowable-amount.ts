@@ -9,24 +9,29 @@ const getBorrowableAmountUncached = async (
   chainId: number,
   revnetId: number,
   collateralCount: number,
-  decimals = 18,
-  currency = 1
+  decimals: number,
+  currency: number
 ): Promise<string> => {
-  const client = getClient(chainId);
+  try {
+    const client = getClient(chainId);
 
-  const result = await client.readContract({
-    address: contracts.RevLoans,
-    abi: revLoansAbi,
-    functionName: "borrowableAmountFrom",
-    args: [
-      BigInt(revnetId),
-      BigInt(collateralCount),
-      BigInt(decimals),
-      BigInt(currency),
-    ],
-  });
+    const result = await client.readContract({
+      address: contracts.RevLoans,
+      abi: revLoansAbi,
+      functionName: "borrowableAmountFrom",
+      args: [
+        BigInt(revnetId),
+        BigInt(collateralCount),
+        BigInt(decimals),
+        BigInt(currency),
+      ],
+    });
 
-  return result.toString();
+    return result.toString();
+  } catch (error) {
+    console.error("Failed to get borrowable amount:", error);
+    return "0";
+  }
 };
 
 export const getBorrowableAmount = unstable_cache(getBorrowableAmountUncached, [
@@ -37,8 +42,8 @@ interface BorrowableAmountParams {
   chainId: number;
   revnetId: number;
   collateralCount: number;
-  decimals?: number;
-  currency?: number;
+  decimals: number;
+  currency: number;
 }
 
 const getMultipleBorrowableAmountsUncached = async (
@@ -47,25 +52,36 @@ const getMultipleBorrowableAmountsUncached = async (
   amounts: string[];
   totalAmount: string;
 }> => {
-  const results = await Promise.all(
-    paramsList.map(
-      ({ chainId, revnetId, collateralCount, decimals = 18, currency = 1 }) =>
-        getBorrowableAmountUncached(
-          chainId,
-          revnetId,
-          collateralCount,
-          decimals,
-          currency
-        )
-    )
-  );
+  try {
+    const results = await Promise.all(
+      paramsList.map(
+        ({ chainId, revnetId, collateralCount, decimals, currency }) =>
+          getBorrowableAmountUncached(
+            chainId,
+            revnetId,
+            collateralCount,
+            decimals,
+            currency
+          )
+      )
+    );
 
-  const totalAmount = results.reduce((sum, amount) => sum + Number(amount), 0);
+    const totalAmount = results.reduce(
+      (sum, amount) => sum + Number(amount),
+      0
+    );
 
-  return {
-    amounts: results,
-    totalAmount: totalAmount.toString(),
-  };
+    return {
+      amounts: results,
+      totalAmount: totalAmount.toString(),
+    };
+  } catch (error) {
+    console.error("Failed to get multiple borrowable amounts:", error);
+    return {
+      amounts: [],
+      totalAmount: "0",
+    };
+  }
 };
 
 export const getMultipleBorrowableAmounts = unstable_cache(
