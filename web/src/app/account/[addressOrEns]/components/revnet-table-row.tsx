@@ -18,7 +18,6 @@ interface RevnetTableRowProps {
   })[];
   totalBalance: number;
   totalCashOutValue: number;
-  totalConditionalNetWorth: number;
   uniqueChains: number[];
 }
 
@@ -47,7 +46,6 @@ export function RevnetTableRow({
     useMultipleBorrowableAmounts(borrowableParams);
 
   const cashOutValueEth = formatBalance(totalCashOutValue);
-  // const conditionalNetWorthEth = formatBalance(totalConditionalNetWorth);
   const borrowableAmountEth = formatBalance(totalBorrowableAmount);
   const logoUrl = parseIpfsUri(project.logoUri);
 
@@ -118,14 +116,6 @@ export function RevnetTableRow({
         </div>
       </TableCell>
       <TableCell className="font-medium">Ξ {cashOutValueEth}</TableCell>
-      {/* <TableCell className="font-medium">
-        <Tooltip>
-          <TooltipTrigger>Ξ {conditionalNetWorthEth}</TooltipTrigger>
-          <TooltipContent>
-            What tokens would be worth if all other holders cash out first
-          </TooltipContent>
-        </Tooltip>
-      </TableCell> */}
       <TableCell className="font-medium">
         <div className="w-20 h-5 flex items-center">
           {isLoading ? (

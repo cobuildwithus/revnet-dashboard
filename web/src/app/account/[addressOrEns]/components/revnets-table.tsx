@@ -41,7 +41,7 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
         ...aggregated,
       };
     })
-    .sort((a, b) => b.totalBalance - a.totalBalance);
+    .sort((a, b) => b.totalCashOutValue - a.totalCashOutValue);
 
   return (
     <Card className="mt-8">
@@ -75,7 +75,6 @@ export function RevnetsTable({ participants }: RevnetsTableProps) {
                 participants={group.participants}
                 totalBalance={group.totalBalance}
                 totalCashOutValue={group.totalCashOutValue}
-                totalConditionalNetWorth={group.totalConditionalNetWorth}
                 uniqueChains={group.uniqueChains}
               />
             ))}

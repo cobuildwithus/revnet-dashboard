@@ -2,8 +2,7 @@
 
 import { unstable_cache } from "next/cache";
 import database from "@/lib/database";
-
-const NATIVE_TOKEN = "0x000000000000000000000000000000000000eeee";
+import { NATIVE_TOKEN } from "@/lib/config";
 
 const getTotalMarketCapUncached = async (): Promise<string> => {
   const result = await database.project.aggregate({
