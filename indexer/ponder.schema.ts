@@ -117,6 +117,10 @@ export const project = onchainTable(
     tags: t.text().array(),
     projectTagline: t.text(),
 
+    accountingToken: t.hex(),
+    accountingDecimals: t.integer(),
+    accountingCurrency: t.integer(),
+
     // For loan calculations
     suckerGroupId: t.text(),
   }),

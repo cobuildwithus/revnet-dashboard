@@ -44,6 +44,9 @@ view Project {
   tags                      String[]
   projectTagline            String? @map("project_tagline")
   suckerGroupId             String? @map("sucker_group_id")
+  accountingToken           String? @map("accounting_token")
+  accountingDecimals        Int?    @map("accounting_decimals")
+  accountingCurrency        Int?    @map("accounting_currency")
 
   participants Participant[]
   rulesets     Ruleset[]

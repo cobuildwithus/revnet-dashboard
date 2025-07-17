@@ -3,6 +3,8 @@
 import { unstable_cache } from "next/cache";
 import database from "@/lib/database";
 
+const NATIVE_TOKEN = "0x000000000000000000000000000000000000eeee";
+
 const getTotalMarketCapUncached = async (): Promise<string> => {
   const result = await database.project.aggregate({
     _sum: {
@@ -10,6 +12,7 @@ const getTotalMarketCapUncached = async (): Promise<string> => {
     },
     where: {
       isRevnet: true,
+      accountingToken: NATIVE_TOKEN,
     },
   });
 
