@@ -88,20 +88,20 @@ export const project = onchainTable(
 
     metadataUri: t.text(),
     metadata: t.json().$type<{
-      name: string;
-      description: string;
-      logoUri: string;
-      infoUri?: string;
-      coverImageUri?: string;
-      twitter?: string;
-      discord?: string;
-      telegram?: string;
-      tokens?: string[];
-      tags?: string[];
+      name: string | null;
+      description: string | null;
+      logoUri: string | null;
+      infoUri: string | null;
+      coverImageUri: string | null;
+      twitter: string | null;
+      discord: string | null;
+      telegram: string | null;
+      tokens: string[] | null;
+      tags: string[] | null;
       softTargetCurrency?: string;
-      domain?: string;
+      domain: string | null;
       version?: number;
-      projectTagline?: string;
+      projectTagline: string | null;
       payDisclosure?: string;
     }>(),
     name: t.text(),
