@@ -120,6 +120,8 @@ export const project = onchainTable(
     accountingToken: t.hex(),
     accountingDecimals: t.integer(),
     accountingCurrency: t.integer(),
+    accountingTokenSymbol: t.text(),
+    accountingTokenName: t.text(),
 
     // For loan calculations
     suckerGroupId: t.text(),

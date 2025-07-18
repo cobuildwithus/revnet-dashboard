@@ -34,6 +34,8 @@ export async function getProjects(chainId: number, projectId: number) {
           accountingToken: true,
           accountingDecimals: true,
           accountingCurrency: true,
+          accountingTokenName: true,
+          accountingTokenSymbol: true,
         },
         where: (project, { eq }) => eq(project.suckerGroupId, suckerGroupId),
       })
@@ -64,6 +66,8 @@ export async function getProjects(chainId: number, projectId: number) {
         accountingToken: proj.accountingToken,
         accountingDecimals: proj.accountingDecimals,
         accountingCurrency: proj.accountingCurrency,
+        accountingTokenName: proj.accountingTokenName,
+        accountingTokenSymbol: proj.accountingTokenSymbol,
       };
     })
   );

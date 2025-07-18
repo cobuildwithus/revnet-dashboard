@@ -1,7 +1,47 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
+import { erc20Abi } from "viem";
 
 ponder.on("JBMultiTerminal:SetAccountingContext", setAccountingContext);
+
+const NATIVE_TOKEN = "0x000000000000000000000000000000000000EEEe";
+
+async function getTokenNameAndSymbol(
+  client: Context["client"],
+  token: `0x${string}`
+): Promise<{ name: string; symbol: string }> {
+  // Handle native token
+  if (token.toLowerCase() === NATIVE_TOKEN.toLowerCase()) {
+    return {
+      name: "Ether",
+      symbol: "ETH",
+    };
+  }
+  try {
+    const [name, symbol] = await Promise.all([
+      client.readContract({
+        address: token,
+        abi: erc20Abi,
+        functionName: "name",
+      }),
+      client.readContract({
+        address: token,
+        abi: erc20Abi,
+        functionName: "symbol",
+      }),
+    ]);
+    return {
+      name: typeof name === "string" ? name : "",
+      symbol: typeof symbol === "string" ? symbol : "",
+    };
+  } catch (e) {
+    // fallback if contract call fails
+    return {
+      name: "",
+      symbol: "",
+    };
+  }
+}
 
 async function setAccountingContext(params: {
   event: Event<"JBMultiTerminal:SetAccountingContext">;
@@ -16,6 +56,11 @@ async function setAccountingContext(params: {
   const projectId = Number(_projectId);
   const { token, decimals, currency } = accountingContext;
 
+  const { name: tokenName, symbol: tokenSymbol } = await getTokenNameAndSymbol(
+    context.client,
+    token
+  );
+
   await context.db
     .update(project, {
       chainId,
@@ -25,5 +70,7 @@ async function setAccountingContext(params: {
       accountingToken: token,
       accountingDecimals: Number(decimals),
       accountingCurrency: Number(currency),
+      accountingTokenName: tokenName,
+      accountingTokenSymbol: tokenSymbol,
     });
 }
