@@ -43,16 +43,6 @@ export function aggregateGroupData<
     return sum + Number(p.cashOutValue);
   }, 0);
 
-  // Group by project to calculate conditional net worth per project
-  const projectGroups = participants.reduce((groups, participant) => {
-    const key = `${participant.chainId}-${participant.projectId || 0}`;
-    if (!groups[key]) {
-      groups[key] = [];
-    }
-    groups[key].push(participant);
-    return groups;
-  }, {} as Record<string, T[]>);
-
   return {
     totalBalance,
     totalCashOutValue,
