@@ -53,26 +53,6 @@ export function aggregateGroupData<
     return groups;
   }, {} as Record<string, T[]>);
 
-  // Calculate conditional net worth for each project group
-  for (const projectParticipants of Object.values(projectGroups)) {
-    const project = projectParticipants[0].project;
-    if (!project) continue;
-
-    const projectTotalBalance = projectParticipants.reduce(
-      (sum, p) => sum + p.balance,
-      0
-    );
-
-    // Use the actual project balance for net-worth calculations.
-    // If the balance is missing (undefined/null), we cannot compute a
-    // reliable conditional net-worth for this project, so skip it.
-    if (project.balance === undefined || project.balance === null) {
-      continue;
-    }
-
-    const projectBalance = Number(project.balance);
-  }
-
   return {
     totalBalance,
     totalCashOutValue,
