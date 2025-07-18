@@ -1,10 +1,10 @@
 import axios from "axios";
 import type { project } from "ponder:schema";
 import { getItem, saveItem } from "./kv-store";
+import { sanitizeUnicode } from "../util/sanitize-unicode";
 
 const PINATA_JWT = process.env.PINATA_JWT;
-const DEDICATED_GW =
-  process.env.PINATA_GATEWAY_BASE ?? "https://gateway.pinata.cloud/ipfs/";
+const DEDICATED_GW = process.env.PINATA_GATEWAY_BASE ?? "https://gateway.pinata.cloud/ipfs/";
 
 type ProjectMetadata = Pick<
   typeof project.$inferSelect,
@@ -38,9 +38,11 @@ const JSON_HDR = { ...AUTH_HDR, "Content-Type": "application/json" };
 const GET_OPTS = { headers: { ...AUTH_HDR, ...UA }, timeout: 7_000 };
 
 const getJSON = async <T>(url: string): Promise<T> => {
-  const { data } = await axios.get<T>(url, GET_OPTS);
+  const response = await axios.get(url, { ...GET_OPTS, responseType: "text" });
   console.info(`GET ${url} → 200`);
-  return data;
+
+  const sanitizedResponse = sanitizeUnicode(response.data);
+  return JSON.parse(sanitizedResponse) as T;
 };
 
 const pinByHash = async (cid: string) => {
@@ -53,16 +55,14 @@ const pinByHash = async (cid: string) => {
   console.info("[pinByHash] Pin request accepted");
 };
 
-export async function fetchProjectMetadata(
-  uri: string
-): Promise<ProjectMetadata | null> {
+export async function fetchProjectMetadata(uri: string): Promise<ProjectMetadata | null> {
   const cid = uri.replace(/^ipfs:\/\//, "");
   if (!cid) {
     console.warn("[metadata] Empty CID from", uri);
     return null;
   }
 
-  const cacheKey = `metadata:${cid}`;
+  const cacheKey = `metadata-v2:${cid}`;
   const cached = await getItem<ProjectMetadata>(cacheKey);
   if (cached) {
     console.info(`[cache] HIT ${cacheKey}`);
@@ -81,8 +81,7 @@ export async function fetchProjectMetadata(
       console.info(`[cache] SAVE ${cacheKey}`);
       return meta;
     } catch (e: any) {
-      const msg =
-        typeof e?.response?.data === "string" ? e.response.data : e.message;
+      const msg = typeof e?.response?.data === "string" ? e.response.data : e.message;
       console.warn(`[gateway] ${tag} miss → ${msg}`);
     }
   }
@@ -99,8 +98,7 @@ export async function fetchProjectMetadata(
         console.info(`[cache] SAVE ${cacheKey}`);
         return meta;
       } catch (e: any) {
-        const body =
-          typeof e?.response?.data === "string" ? e.response.data : "";
+        const body = typeof e?.response?.data === "string" ? e.response.data : "";
         if (body.includes("ERR_ID:00006")) {
           console.info("[poll] Still propagating (00006) …");
           continue;
@@ -109,10 +107,7 @@ export async function fetchProjectMetadata(
       }
     }
   } catch (pinErr) {
-    const body =
-      axios.isAxiosError(pinErr) && pinErr.response
-        ? pinErr.response.data
-        : pinErr;
+    const body = axios.isAxiosError(pinErr) && pinErr.response ? pinErr.response.data : pinErr;
     console.warn("[pinning] Pin attempt failed:", body);
   }
 
