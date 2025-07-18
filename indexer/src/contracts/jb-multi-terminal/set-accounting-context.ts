@@ -1,17 +1,16 @@
 import { type Context, type Event, ponder } from "ponder:registry";
 import { project } from "ponder:schema";
 import { erc20Abi } from "viem";
+import { NATIVE_TOKEN } from "../../constants/eth";
 
 ponder.on("JBMultiTerminal:SetAccountingContext", setAccountingContext);
-
-const NATIVE_TOKEN = "0x000000000000000000000000000000000000EEEe";
 
 async function getTokenNameAndSymbol(
   client: Context["client"],
   token: `0x${string}`
 ): Promise<{ name: string; symbol: string }> {
   // Handle native token
-  if (token.toLowerCase() === NATIVE_TOKEN.toLowerCase()) {
+  if (token.toLowerCase() === NATIVE_TOKEN) {
     return {
       name: "Ether",
       symbol: "ETH",

@@ -66,6 +66,7 @@ export const project = onchainTable(
     ...projectId(t),
     ...balance(t),
     ...paymentsCount(t),
+    ...suckerGroupId(t),
     isRevnet: t.boolean().notNull(),
     deployer: t.hex().notNull(),
     owner: t.hex().notNull(),
@@ -122,9 +123,6 @@ export const project = onchainTable(
     accountingCurrency: t.integer(),
     accountingTokenSymbol: t.text(),
     accountingTokenName: t.text(),
-
-    // For loan calculations
-    suckerGroupId: t.text(),
   }),
   (t) => ({
     projectIdx: index().on(t.projectId),
@@ -162,6 +160,7 @@ export const participant = onchainTable(
     ...projectId(t),
     ...createdAt(t),
     ...balance(t),
+    ...suckerGroupId(t),
     isRevnet: t.boolean(),
     address: t.hex().notNull(),
     firstOwned: t.integer(),
@@ -178,6 +177,7 @@ export const participant = onchainTable(
 export const payEvent = onchainTable("pay_event", (t) => ({
   ...eventParams(t),
   ...projectId(t),
+  ...suckerGroupId(t),
   rulesetId: t.bigint().notNull(),
   rulesetCycleNumber: t.bigint().notNull(),
   payer: t.hex().notNull(),
@@ -186,7 +186,6 @@ export const payEvent = onchainTable("pay_event", (t) => ({
   newlyIssuedTokenCount: t.bigint().notNull(),
   memo: t.text().notNull(),
   metadata: t.hex().notNull(),
-  suckerGroupId: t.text().notNull(),
   caller: t.hex().notNull(),
 }));
 
@@ -198,6 +197,7 @@ export const loan = onchainTable(
     ...projectId(t),
     ...chainId(t),
     ...createdAt(t),
+    ...suckerGroupId(t),
     borrowAmount: t.bigint().notNull(),
     collateral: t.bigint().notNull(),
     sourceFeeAmount: t.bigint().notNull(),
@@ -309,6 +309,7 @@ export const ruleset = onchainTable(
     // Primary identifiers
     ...chainId(t),
     ...projectId(t),
+    ...suckerGroupId(t),
     rulesetId: t.bigint().notNull(), // uint256 from events
 
     // Timestamps

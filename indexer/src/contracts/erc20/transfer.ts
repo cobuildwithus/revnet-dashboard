@@ -65,6 +65,7 @@ async function handleTransfer(params: {
         balance: value,
         firstOwned: Number(event.block.timestamp),
         isRevnet: _project.isRevnet,
+        suckerGroupId: _project.suckerGroupId,
       })
       .onConflictDoUpdate((row) => ({
         balance: row.balance + value,

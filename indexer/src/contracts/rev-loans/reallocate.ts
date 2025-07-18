@@ -34,6 +34,7 @@ async function handleReallocateCollateral(params: {
     id: reallocatedLoanId,
     projectId,
     chainId,
+    suckerGroupId: _project.suckerGroupId,
     createdAt: Number(reallocatedLoan.createdAt),
     borrowAmount: reallocatedLoan.amount,
     collateral: reallocatedLoan.collateral,

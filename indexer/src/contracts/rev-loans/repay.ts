@@ -42,6 +42,7 @@ async function handleRepayLoan(params: {
         id: paidOffLoanId,
         projectId,
         chainId,
+        suckerGroupId: _project.suckerGroupId,
         createdAt: Number(paidOffLoan.createdAt),
         borrowAmount: paidOffLoan.amount,
         collateral: paidOffLoan.collateral,

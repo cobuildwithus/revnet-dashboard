@@ -1,7 +1,18 @@
 import { db } from "ponder:api";
+import { NATIVE_TOKEN } from "../../constants/eth";
 
-export const getRevnetTokenPrice = async (projectId: number, chainId: number): Promise<string> => {
+export const getRevnetTokenPrice = async (
+  projectId: number,
+  chainId: number,
+  accountingToken: `0x${string}`
+): Promise<string> => {
   try {
+    const currencyPriceAdjustment = await getCurrencyPriceAdjustment(
+      projectId,
+      chainId,
+      accountingToken
+    );
+
     const currentTime = Math.floor(Date.now() / 1000);
 
     // Find the currently active ruleset
@@ -36,10 +47,14 @@ export const getRevnetTokenPrice = async (projectId: number, chainId: number): P
     } else {
       // Calculate how many complete cycles have passed
       const durationSeconds = Number(activeRuleset.duration);
-      const cyclesPassed = durationSeconds > 0 ? Math.floor(timeElapsed / durationSeconds) : 0;
+      const cyclesPassed =
+        durationSeconds > 0 ? Math.floor(timeElapsed / durationSeconds) : 0;
 
       // Calculate current weight with decay
-      const decayFactor = calculateDecayFactor(activeRuleset.weightCutPercent, cyclesPassed);
+      const decayFactor = calculateDecayFactor(
+        activeRuleset.weightCutPercent,
+        cyclesPassed
+      );
 
       // Convert weight from Decimal to number, handling the 1e18 scaling
       const initialWeightScaled = Number(activeRuleset.weight);
@@ -56,15 +71,59 @@ export const getRevnetTokenPrice = async (projectId: number, chainId: number): P
       activeRuleset.reservedPercent
     );
 
-    return adjustedPricePerToken.toString();
+    return adjustPriceForDifferentCurrency(
+      adjustedPricePerToken,
+      currencyPriceAdjustment
+    );
   } catch (error) {
     console.error("Error fetching revnet token price:", error);
     return "0";
   }
 };
 
+// Helper to determine the price adjustment for the currency backing the token
+async function getCurrencyPriceAdjustment(
+  projectId: number,
+  chainId: number,
+  accountingToken: `0x${string}`
+): Promise<string> {
+  const isBackedByEth = accountingToken.toLowerCase() === NATIVE_TOKEN;
+  let currencyPriceAdjustment = BigInt(1e18).toString();
+
+  // if not backed by eth, check if backed by another revnet token
+  if (!isBackedByEth) {
+    const backedBy = await db.query.project.findFirst({
+      columns: {
+        projectId: true,
+        chainId: true,
+        accountingToken: true,
+      },
+      where: (project, { eq, and }) =>
+        and(eq(project.erc20, accountingToken), eq(project.chainId, chainId)),
+    });
+
+    if (backedBy && backedBy.accountingToken) {
+      const isBackedByEth =
+        backedBy.accountingToken.toLowerCase() === NATIVE_TOKEN;
+
+      if (isBackedByEth) {
+        currencyPriceAdjustment = await getRevnetTokenPrice(
+          backedBy.projectId,
+          backedBy.chainId,
+          backedBy.accountingToken as `0x${string}`
+        );
+      }
+    }
+  }
+
+  return currencyPriceAdjustment;
+}
+
 // Helper to calculate the decay factor based on weight cut and cycles passed
-function calculateDecayFactor(weightCutPercent: number, cyclesPassed: number): number {
+function calculateDecayFactor(
+  weightCutPercent: number,
+  cyclesPassed: number
+): number {
   const weightCutDecimal = weightCutPercent / 1e9;
   return (1 - weightCutDecimal) ** cyclesPassed;
 }
@@ -79,7 +138,10 @@ function calculatePricePerToken(tokensPerEth: bigint): bigint {
 }
 
 // Helper to adjust price for reserved percentage
-function adjustPriceForReserved(price: bigint, reservedPercent: number): bigint {
+function adjustPriceForReserved(
+  price: bigint,
+  reservedPercent: number
+): bigint {
   // reservedPercent is scaled by 1e4 (e.g., 3800 = 38%)
   // If 38% are reserved, buyers only get 62% of tokens
   // So effective price = price / (1 - reservedPercent/1e4)
@@ -89,4 +151,13 @@ function adjustPriceForReserved(price: bigint, reservedPercent: number): bigint 
     return BigInt(0);
   }
   return (price * BigInt(1e4)) / effectivePercent;
+}
+
+function adjustPriceForDifferentCurrency(
+  price: bigint,
+  currencyPriceAdjustment: string
+): string {
+  return BigInt(
+    Math.floor(Number(price) * (Number(currencyPriceAdjustment) / 1e18))
+  ).toString();
 }

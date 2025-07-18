@@ -46,7 +46,8 @@ export async function getProjects(chainId: number, projectId: number) {
     allProjects.map(async (proj) => {
       const tokenPrice = await getRevnetTokenPrice(
         proj.projectId,
-        proj.chainId
+        proj.chainId,
+        proj.accountingToken as `0x${string}`
       );
 
       return {

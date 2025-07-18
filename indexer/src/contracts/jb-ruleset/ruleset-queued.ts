@@ -153,6 +153,7 @@ async function handleRulesetQueued({
     .values({
       chainId,
       projectId,
+      suckerGroupId: _project.suckerGroupId,
       rulesetId,
       createdAt: Number(event.block.timestamp),
       queuedAt: Number(event.block.timestamp),

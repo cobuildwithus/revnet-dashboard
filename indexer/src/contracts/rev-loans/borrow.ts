@@ -51,6 +51,7 @@ async function handleBorrow(params: {
     id: loanId,
     projectId,
     chainId,
+    suckerGroupId: _project.suckerGroupId,
     owner: caller,
     beneficiary,
     borrowAmount,
