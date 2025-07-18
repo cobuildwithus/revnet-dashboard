@@ -20,7 +20,10 @@ app.get("/project/:chainId/:id", async (c) => {
     if (!projects) return c.json({ error: "Projects not found" }, 404);
     return c.json(projects);
   } catch (error) {
-    return c.json({ error: "Internal server error" }, 500);
+    return c.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      500
+    );
   }
 });
 
