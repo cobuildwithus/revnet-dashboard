@@ -31,6 +31,9 @@ export async function getProjects(chainId: number, projectId: number) {
           metadata: true,
           suckerGroupId: true,
           isRevnet: true,
+          accountingToken: true,
+          accountingDecimals: true,
+          accountingCurrency: true,
         },
         where: (project, { eq }) => eq(project.suckerGroupId, suckerGroupId),
       })
@@ -58,6 +61,9 @@ export async function getProjects(chainId: number, projectId: number) {
         },
         suckerGroupId: proj.suckerGroupId,
         isRevnet: proj.isRevnet,
+        accountingToken: proj.accountingToken,
+        accountingDecimals: proj.accountingDecimals,
+        accountingCurrency: proj.accountingCurrency,
       };
     })
   );
