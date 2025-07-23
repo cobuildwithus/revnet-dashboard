@@ -1,6 +1,7 @@
 import { type Context, type Event, ponder } from "ponder:registry";
-import { participant, payEvent, project } from "ponder:schema";
+import { activityLog, participant, payEvent, project } from "ponder:schema";
 import { refreshProjectCashoutCoefficients } from "../../lib/cashout-coefficients";
+import { formatAmount } from "../../util/format-amount";
 
 ponder.on("JBMultiTerminal:Pay", pay);
 
@@ -65,6 +66,21 @@ async function pay(params: {
     metadata,
     suckerGroupId: updatedProject.suckerGroupId,
   });
+
+  if (newlyIssuedTokenCount > 0) {
+    await context.db.insert(activityLog).values({
+      type: "pay",
+      user: beneficiary,
+      amount: formatAmount(amount, updatedProject.accountingDecimals ?? 18),
+      currency: updatedProject.accountingTokenSymbol || "ETH",
+      description: `got ${formatAmount(newlyIssuedTokenCount, 18)} $${updatedProject.erc20Symbol}`,
+      memo: memo || undefined,
+      chainId,
+      timestamp: Number(event.block.timestamp),
+      txHash: event.transaction.hash,
+      suckerGroupId: updatedProject.suckerGroupId,
+    });
+  }
 
   await refreshProjectCashoutCoefficients({
     db: context.db,
