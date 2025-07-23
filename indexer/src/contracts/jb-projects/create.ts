@@ -33,5 +33,10 @@ async function create(params: {
     owner,
     deployer: caller,
     suckerGroupId: newSuckerGroup.id,
+    accountingToken: "0x0000000000000000000000000000000000000000",
+    accountingDecimals: 18,
+    accountingCurrency: 0,
+    accountingTokenSymbol: "",
+    accountingTokenName: "",
   });
 }

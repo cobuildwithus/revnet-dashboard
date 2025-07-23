@@ -118,11 +118,11 @@ export const project = onchainTable(
     tags: t.text().array(),
     projectTagline: t.text(),
 
-    accountingToken: t.hex(),
-    accountingDecimals: t.integer(),
-    accountingCurrency: t.integer(),
-    accountingTokenSymbol: t.text(),
-    accountingTokenName: t.text(),
+    accountingToken: t.hex().notNull(),
+    accountingDecimals: t.integer().notNull(),
+    accountingCurrency: t.integer().notNull(),
+    accountingTokenSymbol: t.text().notNull(),
+    accountingTokenName: t.text().notNull(),
   }),
   (t) => ({
     projectIdx: index().on(t.projectId),
