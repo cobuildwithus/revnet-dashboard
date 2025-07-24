@@ -1,5 +1,6 @@
 import { ponder, type Context, type Event } from "ponder:registry";
-import { loan, reallocateLoanEvent, project } from "ponder:schema";
+import { loan, reallocateLoanEvent, project, activityLog } from "ponder:schema";
+import { formatAmount } from "../../util/format-amount";
 
 ponder.on("RevLoans:ReallocateCollateral", handleReallocateCollateral);
 
@@ -8,14 +9,8 @@ async function handleReallocateCollateral(params: {
   context: Context<"RevLoans:ReallocateCollateral">;
 }) {
   const { event, context } = params;
-  const {
-    loanId,
-    revnetId,
-    reallocatedLoanId,
-    reallocatedLoan,
-    removedcollateralCount,
-    caller,
-  } = event.args;
+  const { loanId, revnetId, reallocatedLoanId, reallocatedLoan, removedcollateralCount, caller } =
+    event.args;
 
   const projectId = Number(revnetId);
   const chainId = context.chain.id;
@@ -60,5 +55,19 @@ async function handleReallocateCollateral(params: {
     loanId,
     reallocatedLoanId,
     removedCollateralCount: removedcollateralCount,
+  });
+
+  await context.db.insert(activityLog).values({
+    type: "reallocate",
+    user: event.transaction.from,
+    amount: "0",
+    currency: _project.accountingTokenSymbol || "ETH",
+    description: `reallocated loan, removed ${formatAmount(removedcollateralCount, 18)} $${
+      _project.erc20Symbol || "ETH"
+    }`,
+    chainId,
+    timestamp: Number(event.block.timestamp),
+    txHash: event.transaction.hash,
+    suckerGroupId: _project.suckerGroupId,
   });
 }

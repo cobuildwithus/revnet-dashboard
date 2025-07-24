@@ -1,5 +1,6 @@
 import { ponder, type Context, type Event } from "ponder:registry";
-import { loan, liquidateLoanEvent, project } from "ponder:schema";
+import { loan, liquidateLoanEvent, project, activityLog } from "ponder:schema";
+import { formatAmount } from "../../util/format-amount";
 
 ponder.on("RevLoans:Liquidate", handleLiquidate);
 
@@ -45,5 +46,19 @@ async function handleLiquidate(params: {
     suckerGroupId: _project.suckerGroupId || `project-${projectId}`,
     borrowAmount: _loan.amount,
     collateral: _loan.collateral,
+  });
+
+  await context.db.insert(activityLog).values({
+    type: "liquidate",
+    user: event.transaction.from,
+    amount: formatAmount(_loan.amount, _project.accountingDecimals ?? 18),
+    currency: _project.accountingTokenSymbol || "ETH",
+    description: `liquidated loan, seized ${formatAmount(_loan.collateral, 18)} $${
+      _project.erc20Symbol || "ETH"
+    }`,
+    chainId,
+    timestamp: Number(event.block.timestamp),
+    txHash: event.transaction.hash,
+    suckerGroupId: _project.suckerGroupId,
   });
 }

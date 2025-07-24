@@ -1,5 +1,6 @@
 import { ponder, type Context, type Event } from "ponder:registry";
-import { loan, repayLoanEvent, project } from "ponder:schema";
+import { loan, repayLoanEvent, project, activityLog } from "ponder:schema";
+import { formatAmount } from "../../util/format-amount";
 
 ponder.on("RevLoans:RepayLoan", handleRepayLoan);
 
@@ -88,5 +89,19 @@ async function handleRepayLoan(params: {
     paidOffLoanId,
     repayBorrowAmount,
     collateralCountToReturn,
+  });
+
+  await context.db.insert(activityLog).values({
+    type: "repay",
+    user: event.transaction.from,
+    amount: formatAmount(repayBorrowAmount, _project.accountingDecimals ?? 18),
+    currency: _project.accountingTokenSymbol || "ETH",
+    description: `returned ${formatAmount(collateralCountToReturn, 18)} $${
+      _project.erc20Symbol || "ETH"
+    }`,
+    chainId,
+    timestamp: Number(event.block.timestamp),
+    txHash: event.transaction.hash,
+    suckerGroupId: _project.suckerGroupId,
   });
 }

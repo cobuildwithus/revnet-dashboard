@@ -6,8 +6,7 @@ declare global {
   var _redisClient: RedisClientType | undefined;
 }
 
-const redis =
-  global._redisClient ?? createClient({ url: process.env.REDIS_URL });
+const redis = global._redisClient ?? createClient({ url: process.env.REDIS_URL });
 
 if (!global._redisClient) {
   redis
@@ -20,8 +19,12 @@ if (!global._redisClient) {
 
 /* helpers — API kept identical to the @vercel/kv version */
 
-export async function saveItem<T>(key: string, value: T): Promise<void> {
-  await redis.set(key, JSON.stringify(value));
+export async function saveItem<T>(key: string, value: T, ttl?: number): Promise<void> {
+  if (ttl) {
+    await redis.setEx(key, ttl, JSON.stringify(value));
+  } else {
+    await redis.set(key, JSON.stringify(value));
+  }
 }
 
 export async function getItem<T>(key: string): Promise<T | null> {
@@ -31,13 +34,14 @@ export async function getItem<T>(key: string): Promise<T | null> {
 
 export async function saveOrGet<T>(
   key: string,
-  compute: () => Promise<T> | T
+  compute: () => Promise<T> | T,
+  ttl?: number
 ): Promise<T> {
   const cached = await getItem<T>(key);
   if (cached !== null) return cached;
 
   const fresh = await Promise.resolve(compute());
-  await saveItem(key, fresh);
+  await saveItem(key, fresh, ttl);
   return fresh;
 }
 

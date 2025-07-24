@@ -1,7 +1,8 @@
 import { ponder, type Context, type Event } from "ponder:registry";
-import { loan, borrowLoanEvent, project } from "ponder:schema";
+import { loan, borrowLoanEvent, project, activityLog } from "ponder:schema";
 import { revLoansAbi } from "../../../abis";
 import { contracts } from "../../../addresses";
+import { formatAmount } from "../../util/format-amount";
 
 ponder.on("RevLoans:Borrow", handleBorrow);
 
@@ -83,5 +84,19 @@ async function handleBorrow(params: {
     sourceFeeAmount,
     prepaidDuration: Number(_loan.prepaidDuration),
     prepaidFeePercent: Number(_loan.prepaidFeePercent),
+  });
+
+  await context.db.insert(activityLog).values({
+    type: "borrow",
+    user: event.transaction.from,
+    amount: formatAmount(borrowAmount, _project.accountingDecimals ?? 18),
+    currency: _project.accountingTokenSymbol || "ETH",
+    description: `borrowed with ${formatAmount(collateralCount, 18)} $${
+      _project.erc20Symbol || "ETH"
+    } as collateral`,
+    chainId,
+    timestamp: Number(event.block.timestamp),
+    txHash: event.transaction.hash,
+    suckerGroupId: _project.suckerGroupId,
   });
 }
