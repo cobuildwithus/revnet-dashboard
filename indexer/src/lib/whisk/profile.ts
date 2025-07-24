@@ -10,7 +10,7 @@ interface Profile {
 }
 
 export async function getProfile(address: string): Promise<Profile> {
-  const cacheKey = `profile-v1:${address.toLowerCase()}`;
+  const cacheKey = `profile-v2:${address.toLowerCase()}`;
   const cacheTtl = 60 * 60 * 48; // 48 hours
 
   return saveOrGet(
