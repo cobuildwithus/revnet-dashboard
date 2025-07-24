@@ -58,6 +58,7 @@ async function pay(params: {
     projectId,
     rulesetId,
     rulesetCycleNumber,
+    txnValue: event.transaction.value.toString(),
     payer,
     beneficiary,
     amount,
@@ -73,7 +74,9 @@ async function pay(params: {
       user: beneficiary,
       amount: formatAmount(amount, updatedProject.accountingDecimals ?? 18),
       currency: updatedProject.accountingTokenSymbol || "ETH",
-      description: `got ${formatAmount(newlyIssuedTokenCount, 18)} $${updatedProject.erc20Symbol}`,
+      description: `got ${formatAmount(newlyIssuedTokenCount, 18)} $${
+        updatedProject.erc20Symbol
+      }`,
       memo: memo || undefined,
       chainId,
       timestamp: Number(event.block.timestamp),

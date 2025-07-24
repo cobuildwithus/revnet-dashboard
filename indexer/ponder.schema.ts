@@ -187,6 +187,7 @@ export const payEvent = onchainTable("pay_event", (t) => ({
   memo: t.text().notNull(),
   metadata: t.hex().notNull(),
   caller: t.hex().notNull(),
+  txnValue: t.text().notNull(),
 }));
 
 // Basic loan entity for tracking borrowable amounts
