@@ -5,7 +5,7 @@ export const getRevnetTokenPrice = async (
   projectId: number,
   chainId: number,
   accountingToken: `0x${string}`
-): Promise<string> => {
+): Promise<{ ethPrice: string; accountingTokenPrice: string }> => {
   try {
     const currencyPriceAdjustment = await getCurrencyPriceAdjustment(
       chainId,
@@ -33,7 +33,7 @@ export const getRevnetTokenPrice = async (
       orderBy: (ruleset, { desc }) => [desc(ruleset.start)],
     });
 
-    if (!activeRuleset) return "0";
+    if (!activeRuleset) return { ethPrice: "0", accountingTokenPrice: "0" };
 
     // Calculate how much time has passed since the ruleset started
     const timeElapsed = currentTime - Number(activeRuleset.start);
@@ -70,13 +70,18 @@ export const getRevnetTokenPrice = async (
       activeRuleset.reservedPercent
     );
 
-    return adjustPriceForDifferentCurrency(
+    const ethPrice = adjustPriceForDifferentCurrency(
       adjustedPricePerToken,
       currencyPriceAdjustment
     );
+
+    return {
+      ethPrice,
+      accountingTokenPrice: adjustedPricePerToken.toString(),
+    };
   } catch (error) {
     console.error("Error fetching revnet token price:", error);
-    return "0";
+    return { ethPrice: "0", accountingTokenPrice: "0" };
   }
 };
 
@@ -105,11 +110,13 @@ async function getCurrencyPriceAdjustment(
         backedBy.accountingToken.toLowerCase() === NATIVE_TOKEN;
 
       if (isBackedByEth) {
-        currencyPriceAdjustment = await getRevnetTokenPrice(
+        const price = await getRevnetTokenPrice(
           backedBy.projectId,
           backedBy.chainId,
           backedBy.accountingToken as `0x${string}`
         );
+
+        currencyPriceAdjustment = price.ethPrice;
       }
     }
   }

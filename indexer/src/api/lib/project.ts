@@ -44,7 +44,7 @@ export async function getProjects(chainId: number, projectId: number) {
   // Build the response array with token prices
   const projectsWithPrices = await Promise.all(
     allProjects.map(async (proj) => {
-      const tokenPrice = await getRevnetTokenPrice(
+      const { ethPrice, accountingTokenPrice } = await getRevnetTokenPrice(
         proj.projectId,
         proj.chainId,
         proj.accountingToken as `0x${string}`
@@ -59,7 +59,8 @@ export async function getProjects(chainId: number, projectId: number) {
           name: proj.erc20Name,
           symbol: proj.erc20Symbol,
           address: proj.erc20,
-          price: tokenPrice,
+          ethPrice,
+          accountingTokenPrice,
           disclosure: proj.metadata?.payDisclosure || "",
         },
         suckerGroupId: proj.suckerGroupId,
