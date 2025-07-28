@@ -15,11 +15,17 @@ app.use("/graphql", graphql({ db, schema }));
 
 app.get("/project/:chainId/:id", async (c) => {
   try {
-    const projects = await getProjects(Number(c.req.param("chainId")), Number(c.req.param("id")));
+    const projects = await getProjects(
+      Number(c.req.param("chainId")),
+      Number(c.req.param("id"))
+    );
     if (!projects) return c.json({ error: "Projects not found" }, 404);
     return c.json(projects);
   } catch (error) {
-    return c.json({ error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    return c.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      500
+    );
   }
 });
 
@@ -34,7 +40,10 @@ app.get("/activity/:chainId/:projectId", async (c) => {
 
     return c.json(result);
   } catch (error) {
-    return c.json({ error: error instanceof Error ? error.message : "Unknown error" }, 500);
+    return c.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      500
+    );
   }
 });
 

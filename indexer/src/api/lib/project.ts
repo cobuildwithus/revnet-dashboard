@@ -66,7 +66,7 @@ export async function getProjects(chainId: number, projectId: number) {
         isRevnet: proj.isRevnet,
         accountingToken: proj.accountingToken,
         accountingDecimals: proj.accountingDecimals,
-        accountingCurrency: proj.accountingCurrency,
+        accountingCurrency: proj.accountingCurrency.toString(),
         accountingTokenName: proj.accountingTokenName,
         accountingTokenSymbol: proj.accountingTokenSymbol,
       };

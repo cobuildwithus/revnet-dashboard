@@ -8,7 +8,6 @@ export const getRevnetTokenPrice = async (
 ): Promise<string> => {
   try {
     const currencyPriceAdjustment = await getCurrencyPriceAdjustment(
-      projectId,
       chainId,
       accountingToken
     );
@@ -83,7 +82,6 @@ export const getRevnetTokenPrice = async (
 
 // Helper to determine the price adjustment for the currency backing the token
 async function getCurrencyPriceAdjustment(
-  projectId: number,
   chainId: number,
   accountingToken: `0x${string}`
 ): Promise<string> {
