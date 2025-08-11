@@ -55,6 +55,7 @@ export async function getProjects(chainId: number, projectId: number) {
         projectId: proj.projectId,
         name: proj.name,
         tagline: proj.projectTagline,
+        logoUri: proj.logoUri,
         token: {
           name: proj.erc20Name,
           symbol: proj.erc20Symbol,
