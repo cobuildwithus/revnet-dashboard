@@ -1,17 +1,17 @@
 import { createConfig, factory } from "ponder";
 import { contracts } from "./addresses";
+import { config, getChainsAndRpcUrls } from "./src/lib/config";
+import { erc20Abi, getAbiItem } from "viem";
 import {
   jbControllerAbi,
   jbMultiTerminalAbi,
   jbProjectsAbi,
   jbRulesetsAbi,
-  jbSuckersRegistryAbi,
+  jbSuckerRegistryAbi,
   jbTokensAbi,
   revDeployerAbi,
   revLoansAbi,
-} from "./abis";
-import { config, getChainsAndRpcUrls } from "./src/lib/config";
-import { erc20Abi, getAbiItem } from "viem";
+} from "juice-sdk-core";
 
 export default createConfig({
   ordering: "omnichain",
@@ -59,12 +59,12 @@ export default createConfig({
     RevLoans: {
       chain: config.RevLoans,
       abi: revLoansAbi,
-      address: contracts.RevLoans,
+      address: contracts.REVLoans,
     },
     JBSuckersRegistry: {
-      chain: config.JBSuckersRegistry,
-      abi: jbSuckersRegistryAbi,
-      address: contracts.JBSuckersRegistry,
+      chain: config.JBSuckerRegistry,
+      abi: jbSuckerRegistryAbi,
+      address: contracts.JBSuckerRegistry,
     },
   },
   blocks: {

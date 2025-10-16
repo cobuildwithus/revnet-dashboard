@@ -35,7 +35,7 @@ async function create(params: {
     suckerGroupId: newSuckerGroup.id,
     accountingToken: "0x0000000000000000000000000000000000000000",
     accountingDecimals: 18,
-    accountingCurrency: 0,
+    accountingCurrency: 0n,
     accountingTokenSymbol: "",
     accountingTokenName: "",
   });

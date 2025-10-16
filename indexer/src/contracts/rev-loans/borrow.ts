@@ -1,6 +1,6 @@
 import { ponder, type Context, type Event } from "ponder:registry";
 import { loan, borrowLoanEvent, project, activityLog } from "ponder:schema";
-import { revLoansAbi } from "../../../abis";
+import { revLoansAbi } from "juice-sdk-core";
 import { contracts } from "../../../addresses";
 import { formatAmount } from "../../util/format-amount";
 
@@ -39,7 +39,7 @@ async function handleBorrow(params: {
   try {
     tokenUri = await context.client.readContract({
       abi: revLoansAbi,
-      address: contracts.RevLoans,
+      address: contracts.REVLoans,
       functionName: "tokenURI",
       args: [loanId],
     });
