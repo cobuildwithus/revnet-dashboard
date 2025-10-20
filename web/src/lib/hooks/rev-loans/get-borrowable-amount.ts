@@ -15,16 +15,14 @@ const getBorrowableAmountUncached = async (
   try {
     const client = getClient(chainId);
 
+    const address = contracts.REVLoans[chainId.toString() as keyof typeof contracts.REVLoans];
+    if (!address) throw new Error(`REVLoans contract not found for chainId: ${chainId}`);
+
     const result = await client.readContract({
-      address: contracts.RevLoans,
+      address,
       abi: revLoansAbi,
       functionName: "borrowableAmountFrom",
-      args: [
-        BigInt(revnetId),
-        BigInt(collateralCount),
-        BigInt(decimals),
-        BigInt(currency),
-      ],
+      args: [BigInt(revnetId), BigInt(collateralCount), BigInt(decimals), BigInt(currency)],
     });
 
     return result.toString();
@@ -54,22 +52,12 @@ const getMultipleBorrowableAmountsUncached = async (
 }> => {
   try {
     const results = await Promise.all(
-      paramsList.map(
-        ({ chainId, revnetId, collateralCount, decimals, currency }) =>
-          getBorrowableAmountUncached(
-            chainId,
-            revnetId,
-            collateralCount,
-            decimals,
-            currency
-          )
+      paramsList.map(({ chainId, revnetId, collateralCount, decimals, currency }) =>
+        getBorrowableAmountUncached(chainId, revnetId, collateralCount, decimals, currency)
       )
     );
 
-    const totalAmount = results.reduce(
-      (sum, amount) => sum + Number(amount),
-      0
-    );
+    const totalAmount = results.reduce((sum, amount) => sum + Number(amount), 0);
 
     return {
       amounts: results,
@@ -84,7 +72,6 @@ const getMultipleBorrowableAmountsUncached = async (
   }
 };
 
-export const getMultipleBorrowableAmounts = unstable_cache(
-  getMultipleBorrowableAmountsUncached,
-  ["multiple-borrowable-amounts"]
-);
+export const getMultipleBorrowableAmounts = unstable_cache(getMultipleBorrowableAmountsUncached, [
+  "multiple-borrowable-amounts",
+]);

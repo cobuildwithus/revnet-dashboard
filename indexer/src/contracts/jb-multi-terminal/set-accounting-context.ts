@@ -68,7 +68,7 @@ async function setAccountingContext(params: {
     .set({
       accountingToken: token,
       accountingDecimals: Number(decimals),
-      accountingCurrency: Number(currency),
+      accountingCurrency: BigInt(currency),
       accountingTokenName: tokenName,
       accountingTokenSymbol: tokenSymbol,
     });

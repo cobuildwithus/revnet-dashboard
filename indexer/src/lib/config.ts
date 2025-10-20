@@ -131,7 +131,7 @@ export const config = {
       startBlock: 7729794,
     },
   },
-  JBSuckersRegistry: {
+  JBSuckerRegistry: {
     ethereum: {
       startBlock: 21863660,
     },
