@@ -17,12 +17,12 @@ run:
     port: 8080
   secrets:
     - name: INFURA_API_KEY
-      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_INFURA_API_KEY-xxxxxxxx"
+      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_INFURA_API_KEY-V6Vrrz"
     - name: DATABASE_URL
-      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_DB_URL-xxxxxxxx"
+      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_DB_URL-AgInbg"
     - name: REDIS_URL
-      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_REDIS_URL-xxxxxxxx"
+      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_REDIS_URL-wuALAL"
     - name: WHISK_API_KEY
-      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_WHISK_API_KEY-xxxxxxxx"
+      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_WHISK_API_KEY-Z1xv1k"
     - name: PINATA_JWT
-      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_PINATA_JWT-xxxxxxxx"
+      value-from: "arn:aws:secretsmanager:us-east-1:741448937731:secret:prod/REVNET_PINATA_JWT-FTBpxx"
