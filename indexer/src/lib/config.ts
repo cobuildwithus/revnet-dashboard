@@ -1,5 +1,4 @@
 import { base, mainnet, arbitrum, optimism } from "viem/chains";
-import { sepolia } from "viem/chains";
 import { rpcUrl } from "./rpc-url";
 
 export const config = {
@@ -16,9 +15,6 @@ export const config = {
     optimism: {
       startBlock: 132116325,
     },
-    ethereumSepolia: {
-      startBlock: 7729792,
-    },
   },
   JBTokens: {
     ethereum: {
@@ -32,9 +28,6 @@ export const config = {
     },
     optimism: {
       startBlock: 132080297,
-    },
-    ethereumSepolia: {
-      startBlock: 7724144,
     },
   },
   JBProjects: {
@@ -50,9 +43,6 @@ export const config = {
     optimism: {
       startBlock: 132080242,
     },
-    ethereumSepolia: {
-      startBlock: 7724105,
-    },
   },
   JBController: {
     ethereum: {
@@ -66,9 +56,6 @@ export const config = {
     },
     optimism: {
       startBlock: 132080314,
-    },
-    ethereumSepolia: {
-      startBlock: 7724149,
     },
   },
   ERC20: {
@@ -84,9 +71,6 @@ export const config = {
     optimism: {
       startBlock: 132080297,
     },
-    ethereumSepolia: {
-      startBlock: 7724144,
-    },
   },
   JBMultiTerminal: {
     ethereum: {
@@ -101,9 +85,6 @@ export const config = {
     optimism: {
       startBlock: 132080347,
     },
-    ethereumSepolia: {
-      startBlock: 7724161,
-    },
   },
   JBRulesets: {
     base: {
@@ -112,7 +93,6 @@ export const config = {
     ethereum: { startBlock: 21863161 },
     optimism: { startBlock: 132080269 },
     arbitrum: { startBlock: 306857614 },
-    ethereumSepolia: { startBlock: 7724144 },
   },
   RevLoans: {
     ethereum: {
@@ -127,9 +107,6 @@ export const config = {
     optimism: {
       startBlock: 132116331,
     },
-    ethereumSepolia: {
-      startBlock: 7729794,
-    },
   },
   JBSuckerRegistry: {
     ethereum: {
@@ -143,9 +120,6 @@ export const config = {
     },
     optimism: {
       startBlock: 132083296,
-    },
-    ethereumSepolia: {
-      startBlock: 7724468,
     },
   },
 };
@@ -167,10 +141,6 @@ export const getChainsAndRpcUrls = () => {
     optimism: {
       id: optimism.id,
       rpc: rpcUrl("optimism"),
-    },
-    ethereumSepolia: {
-      id: sepolia.id,
-      rpc: rpcUrl("eth-sepolia"),
     },
   };
 };
