@@ -424,6 +424,9 @@ export const cashoutCoefficientSnapshot = onchainTable(
     txHash: t.hex().notNull(),
     cashoutA: t.bigint().notNull(),
     cashoutB: t.bigint().notNull(),
+    balance: t.bigint().notNull(),
+    totalSupply: t.bigint().notNull(),
+    cashOutTaxRate: t.integer().notNull(),
   }),
   (t) => ({
     suckerGroupIdIdx: index().on(t.suckerGroupId),

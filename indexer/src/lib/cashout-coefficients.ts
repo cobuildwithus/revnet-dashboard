@@ -1,6 +1,4 @@
-import { and } from "ponder";
-import { eq } from "ponder";
-import { sql } from "ponder";
+import { and, eq, sql } from "ponder";
 import type { Context } from "ponder:registry";
 import { cashoutCoefficientSnapshot, participant, project, ruleset } from "ponder:schema";
 
@@ -100,7 +98,6 @@ export async function refreshProjectCashoutCoefficients({
 
   const A = calculateCashoutA(overflow, tax, totalSupplyWithPending);
   const B = calculateCashoutB(overflow, tax, totalSupplyWithPending);
-  const hasChanged = currentProject.cashout__A !== A || currentProject.cashout__B !== B;
 
   // Update the project's cashout coefficients in the database
   await db
@@ -113,7 +110,7 @@ export async function refreshProjectCashoutCoefficients({
       cashout__B: B,
     });
 
-  if (snapshot && currentProject.suckerGroupId && hasChanged) {
+  if (snapshot && currentProject.suckerGroupId) {
     await db.insert(cashoutCoefficientSnapshot).values({
       chainId,
       projectId,
@@ -122,6 +119,9 @@ export async function refreshProjectCashoutCoefficients({
       txHash: snapshot.txHash,
       cashoutA: A,
       cashoutB: B,
+      balance: overflow,
+      totalSupply: totalSupplyWithPending,
+      cashOutTaxRate: Number(currentRuleset.cashOutTaxRate),
     });
   }
 
