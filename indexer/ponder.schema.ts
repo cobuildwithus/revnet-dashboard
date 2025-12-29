@@ -412,3 +412,22 @@ export const activityLog = onchainTable(
     suckerGroupId: index().on(t.suckerGroupId),
   })
 );
+
+export const cashoutCoefficientSnapshot = onchainTable(
+  "cashout_coefficient_snapshot",
+  (t) => ({
+    ...uniqueId(t),
+    ...chainId(t),
+    ...projectId(t),
+    ...suckerGroupId(t),
+    ...timestamp(t),
+    txHash: t.hex().notNull(),
+    cashoutA: t.bigint().notNull(),
+    cashoutB: t.bigint().notNull(),
+  }),
+  (t) => ({
+    suckerGroupIdIdx: index().on(t.suckerGroupId),
+    projectIdx: index().on(t.projectId),
+    timestampIdx: index().on(t.timestamp),
+  })
+);

@@ -2,7 +2,7 @@ import { and } from "ponder";
 import { eq } from "ponder";
 import { sql } from "ponder";
 import type { Context } from "ponder:registry";
-import { participant, project, ruleset } from "ponder:schema";
+import { cashoutCoefficientSnapshot, participant, project, ruleset } from "ponder:schema";
 
 const MAX_TAX = 10_000n;
 const WAD = 1_000_000_000_000_000_000n; // 1 × 10¹⁸
@@ -64,10 +64,12 @@ export async function refreshProjectCashoutCoefficients({
   db,
   chainId,
   projectId,
+  snapshot,
 }: {
   db: Context["db"];
   chainId: number;
   projectId: number;
+  snapshot?: { timestamp: number; txHash: `0x${string}` };
 }) {
   const currentProject = await db.find(project, {
     chainId,
@@ -98,6 +100,7 @@ export async function refreshProjectCashoutCoefficients({
 
   const A = calculateCashoutA(overflow, tax, totalSupplyWithPending);
   const B = calculateCashoutB(overflow, tax, totalSupplyWithPending);
+  const hasChanged = currentProject.cashout__A !== A || currentProject.cashout__B !== B;
 
   // Update the project's cashout coefficients in the database
   await db
@@ -109,6 +112,18 @@ export async function refreshProjectCashoutCoefficients({
       cashout__A: A,
       cashout__B: B,
     });
+
+  if (snapshot && currentProject.suckerGroupId && hasChanged) {
+    await db.insert(cashoutCoefficientSnapshot).values({
+      chainId,
+      projectId,
+      suckerGroupId: currentProject.suckerGroupId,
+      timestamp: snapshot.timestamp,
+      txHash: snapshot.txHash,
+      cashoutA: A,
+      cashoutB: B,
+    });
+  }
 
   await bulkRefreshParticipants({
     db,

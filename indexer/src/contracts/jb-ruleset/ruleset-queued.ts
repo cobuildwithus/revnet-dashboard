@@ -242,6 +242,10 @@ async function handleRulesetQueued({
       db: context.db,
       chainId,
       projectId,
+      snapshot: {
+        timestamp: Number(event.block.timestamp),
+        txHash: event.transaction.hash,
+      },
     });
   }
 }
