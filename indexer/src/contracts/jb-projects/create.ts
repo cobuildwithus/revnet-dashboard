@@ -14,6 +14,13 @@ async function create(params: {
   const chainId = context.chain.id;
   const projectIdNum = Number(projectId);
 
+  // Idempotency guard: the create event can be replayed during crash recovery/reorgs.
+  const existing = await context.db.find(project, {
+    chainId,
+    projectId: projectIdNum,
+  });
+  if (existing) return;
+
   // Create a unique identifier for the project using chainId and projectId
   const projectUniqueId = `${chainId}-${projectIdNum}`;
 
