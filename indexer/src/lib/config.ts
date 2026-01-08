@@ -1,13 +1,10 @@
-import { base, mainnet, arbitrum, optimism } from "viem/chains";
+import { base, mainnet, optimism } from "viem/chains";
 import { rpcUrl } from "./rpc-url";
 
 export const config = {
   RevDeployer: {
     ethereum: {
       startBlock: 21869094,
-    },
-    arbitrum: {
-      startBlock: 307144912,
     },
     base: {
       startBlock: 26521040,
@@ -20,9 +17,6 @@ export const config = {
     ethereum: {
       startBlock: 21863179,
     },
-    arbitrum: {
-      startBlock: 306857750,
-    },
     base: {
       startBlock: 26485001,
     },
@@ -33,9 +27,6 @@ export const config = {
   JBProjects: {
     ethereum: {
       startBlock: 21863142,
-    },
-    arbitrum: {
-      startBlock: 306857479,
     },
     base: {
       startBlock: 26484953,
@@ -48,9 +39,6 @@ export const config = {
     ethereum: {
       startBlock: 21863191,
     },
-    arbitrum: {
-      startBlock: 306857842,
-    },
     base: {
       startBlock: 26485017,
     },
@@ -62,9 +50,6 @@ export const config = {
     ethereum: {
       startBlock: 21863179,
     },
-    arbitrum: {
-      startBlock: 306857750,
-    },
     base: {
       startBlock: 26485001,
     },
@@ -75,9 +60,6 @@ export const config = {
   JBMultiTerminal: {
     ethereum: {
       startBlock: 21863215,
-    },
-    arbitrum: {
-      startBlock: 306858028,
     },
     base: {
       startBlock: 26485049,
@@ -92,14 +74,10 @@ export const config = {
     },
     ethereum: { startBlock: 21863161 },
     optimism: { startBlock: 132080269 },
-    arbitrum: { startBlock: 306857614 },
   },
   RevLoans: {
     ethereum: {
       startBlock: 21869096,
-    },
-    arbitrum: {
-      startBlock: 307144959,
     },
     base: {
       startBlock: 26521046,
@@ -111,9 +89,6 @@ export const config = {
   JBSuckerRegistry: {
     ethereum: {
       startBlock: 21863660,
-    },
-    arbitrum: {
-      startBlock: 306881281,
     },
     base: {
       startBlock: 26487986,
@@ -133,10 +108,6 @@ export const getChainsAndRpcUrls = () => {
     ethereum: {
       id: mainnet.id,
       rpc: rpcUrl("eth"),
-    },
-    arbitrum: {
-      id: arbitrum.id,
-      rpc: rpcUrl("arbitrum"),
     },
     optimism: {
       id: optimism.id,

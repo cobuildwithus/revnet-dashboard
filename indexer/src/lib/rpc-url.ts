@@ -3,11 +3,9 @@ import { http } from "viem";
 type Chain =
   | "base"
   | "eth"
-  | "arbitrum"
   | "optimism"
   | "base-sepolia"
   | "eth-sepolia"
-  | "arb-sepolia"
   | "opt-sepolia";
 
 const getPrefix = (chain: Chain): string => {
@@ -16,16 +14,12 @@ const getPrefix = (chain: Chain): string => {
       return "base-mainnet";
     case "eth":
       return "mainnet";
-    case "arbitrum":
-      return "arbitrum-mainnet";
     case "optimism":
       return "optimism-mainnet";
     case "base-sepolia":
       return "base-sepolia";
     case "eth-sepolia":
       return "sepolia";
-    case "arb-sepolia":
-      return "arbitrum-sepolia";
     case "opt-sepolia":
       return "optimism-sepolia";
     default:

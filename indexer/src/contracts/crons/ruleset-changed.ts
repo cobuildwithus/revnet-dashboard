@@ -4,20 +4,17 @@ import { project, rulesetActivationState } from "ponder:schema";
 ponder.on("CheckRulesetBase:block", handleRulesetActivation);
 ponder.on("CheckRulesetEthereum:block", handleRulesetActivation);
 ponder.on("CheckRulesetOptimism:block", handleRulesetActivation);
-ponder.on("CheckRulesetArbitrum:block", handleRulesetActivation);
 
 async function handleRulesetActivation(params: {
   event: Event<
     | "CheckRulesetBase:block"
     | "CheckRulesetEthereum:block"
     | "CheckRulesetOptimism:block"
-    | "CheckRulesetArbitrum:block"
   >;
   context: Context<
     | "CheckRulesetBase:block"
     | "CheckRulesetEthereum:block"
     | "CheckRulesetOptimism:block"
-    | "CheckRulesetArbitrum:block"
   >;
 }) {
   const { context, event } = params;

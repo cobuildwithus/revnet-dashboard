@@ -83,10 +83,5 @@ export default createConfig({
       startBlock: "latest",
       interval: 600 / 2, // Every 10 minutes (optimism block time is 2s)
     },
-    CheckRulesetArbitrum: {
-      chain: "arbitrum",
-      startBlock: "latest",
-      interval: 600 / 0.25, // Every 10 minutes (arbitrum block time is ~0.25s)
-    },
   },
 });

@@ -1,18 +1,10 @@
-import {
-  baseSepolia,
-  sepolia,
-  arbitrumSepolia,
-  optimismSepolia,
-} from "viem/chains";
+import { baseSepolia, sepolia, optimismSepolia } from "viem/chains";
 import { rpcUrl } from "./rpc-url";
 
 export const config = {
   RevDeployer: {
     ethereumSepolia: {
       startBlock: 7729792,
-    },
-    arbitrumSepolia: {
-      startBlock: 124752297,
     },
     baseSepolia: {
       startBlock: 22031613,
@@ -25,9 +17,6 @@ export const config = {
     ethereumSepolia: {
       startBlock: 7724144,
     },
-    arbitrumSepolia: {
-      startBlock: 124457695,
-    },
     baseSepolia: {
       startBlock: 21993057,
     },
@@ -38,9 +27,6 @@ export const config = {
   JBProjects: {
     ethereumSepolia: {
       startBlock: 7724105,
-    },
-    arbitrumSepolia: {
-      startBlock: 124457424,
     },
     baseSepolia: {
       startBlock: 21993006,
@@ -53,9 +39,6 @@ export const config = {
     ethereumSepolia: {
       startBlock: 7724149,
     },
-    arbitrumSepolia: {
-      startBlock: 124457787,
-    },
     baseSepolia: {
       startBlock: 21993075,
     },
@@ -67,9 +50,6 @@ export const config = {
     ethereumSepolia: {
       startBlock: 7724144,
     },
-    arbitrumSepolia: {
-      startBlock: 124457695,
-    },
     baseSepolia: {
       startBlock: 21993057,
     },
@@ -80,9 +60,6 @@ export const config = {
   JBMultiTerminal: {
     ethereumSepolia: {
       startBlock: 7724161,
-    },
-    arbitrumSepolia: {
-      startBlock: 124457968,
     },
     baseSepolia: {
       startBlock: 21993109,
@@ -97,14 +74,10 @@ export const config = {
     },
     ethereumSepolia: { startBlock: 7724144 },
     optimismSepolia: { startBlock: 23975934 },
-    arbitrumSepolia: { startBlock: 124457695 },
   },
   RevLoans: {
     ethereumSepolia: {
       startBlock: 7729794,
-    },
-    arbitrumSepolia: {
-      startBlock: 124752346,
     },
     baseSepolia: {
       startBlock: 22031619,
@@ -116,9 +89,6 @@ export const config = {
   JBSuckersRegistry: {
     ethereumSepolia: {
       startBlock: 7724468,
-    },
-    arbitrumSepolia: {
-      startBlock: 124497109,
     },
     baseSepolia: {
       startBlock: 21998497,
@@ -138,10 +108,6 @@ export const getTestnetChainsAndRpcUrls = () => {
     ethereumSepolia: {
       id: sepolia.id,
       rpc: rpcUrl("eth-sepolia"),
-    },
-    arbitrumSepolia: {
-      id: arbitrumSepolia.id,
-      rpc: rpcUrl("arb-sepolia"),
     },
     optimismSepolia: {
       id: optimismSepolia.id,
