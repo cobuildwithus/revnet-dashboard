@@ -359,6 +359,17 @@ export const ruleset = onchainTable(
   })
 );
 
+export const rulesetActivationState = onchainTable(
+  "ruleset_activation_state",
+  (t) => ({
+    ...chainId(t),
+    lastChecked: t.bigint().notNull(),
+  }),
+  (table) => ({
+    pk: primaryKey({ columns: [table.chainId] }),
+  })
+);
+
 export const ERC20ToProjectId = onchainTable(
   "_kv_ERC20ToProjectId",
   (t) => ({

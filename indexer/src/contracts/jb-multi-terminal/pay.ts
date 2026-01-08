@@ -42,6 +42,7 @@ async function pay(params: {
       balance: p.balance + amount,
       paymentsCount: p.paymentsCount + 1,
       contributorsCount: p.contributorsCount + (payerParticipant ? 0 : 1),
+      currentRulesetId: rulesetId,
     }));
 
   if (!updatedProject.suckerGroupId) {

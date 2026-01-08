@@ -13,7 +13,7 @@ async function cashOutTokens(params: {
   const { args } = event;
   const { id: chainId } = context.chain;
 
-  const { projectId: _projectId, reclaimAmount, cashOutCount } = args;
+  const { projectId: _projectId, rulesetId, reclaimAmount, cashOutCount } = args;
   const projectId = Number(_projectId);
 
   const updatedProject = await context.db
@@ -25,6 +25,7 @@ async function cashOutTokens(params: {
       redeemCount: p.redeemCount + 1,
       redeemVolume: p.redeemVolume + reclaimAmount,
       balance: p.balance - reclaimAmount,
+      currentRulesetId: rulesetId,
     }));
 
   if (!updatedProject.suckerGroupId) {

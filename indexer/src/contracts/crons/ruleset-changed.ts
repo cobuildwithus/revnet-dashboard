@@ -1,5 +1,5 @@
 import { ponder, type Context, type Event } from "ponder:registry";
-import { project } from "ponder:schema";
+import { project, rulesetActivationState } from "ponder:schema";
 
 ponder.on("CheckRulesetBase:block", handleRulesetActivation);
 ponder.on("CheckRulesetEthereum:block", handleRulesetActivation);
@@ -23,11 +23,18 @@ async function handleRulesetActivation(params: {
   const { context, event } = params;
   const chainId = context.chain.id;
   const currentTimestamp = BigInt(event.block.timestamp);
+  const state = await context.db.find(rulesetActivationState, { chainId });
+  const lastChecked = state?.lastChecked ?? 0n;
+  const effectiveLastChecked = lastChecked > 0n ? lastChecked - 1n : 0n;
 
-  // Fetch rulesets that should now be active (start time passed)
+  // Fetch rulesets that became active since the last check (start time passed)
   const pendingRulesets = await context.db.sql.query.ruleset.findMany({
-    where: (ruleset, { eq, lte, and }) =>
-      and(eq(ruleset.chainId, chainId), lte(ruleset.start, currentTimestamp)),
+    where: (ruleset, { eq, lte, gt, and }) =>
+      and(
+        eq(ruleset.chainId, chainId),
+        gt(ruleset.start, effectiveLastChecked),
+        lte(ruleset.start, currentTimestamp)
+      ),
     columns: {
       projectId: true,
       rulesetId: true,
@@ -68,7 +75,6 @@ async function handleRulesetActivation(params: {
 
       // Only update if the currentRulesetId is different
       if (currentProject.currentRulesetId !== rulesetId) {
-        // Update project's currentRulesetId
         await context.db
           .update(project, {
             chainId,
@@ -80,4 +86,14 @@ async function handleRulesetActivation(params: {
       }
     })
   );
+
+  await context.db
+    .insert(rulesetActivationState)
+    .values({
+      chainId,
+      lastChecked: currentTimestamp,
+    })
+    .onConflictDoUpdate({
+      lastChecked: currentTimestamp,
+    });
 }
